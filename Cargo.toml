@@ -1,0 +1,44 @@
+[package]
+name = "wept"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+description = "Wept is a web application framework built on Dioxus."
+repository = "https://github.com/alexwatever/wept"
+authors = ["Alex Watson <alex@coded.cc>"]
+license = "MPL-2.0"
+
+[dependencies]
+dioxus = { version = "0.6.2", features = ["fullstack", "router"] }
+parse-display = { version = "0.10.0" }
+reqwest = { version = "0.12.5", features = ["json"] }
+serde = { version = "1.0.136", features = ["derive"] }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+# chrono = { version = "0.4.34", features = ["serde", "wasmbind"] }
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+# chrono = { version = "0.4.34", features = ["serde"] }
+
+[features]
+web = ["dioxus/web"]
+server = ["dioxus/server"]
+
+[lints.rust]
+unsafe_code = "forbid"
+unused-features = "warn"
+unused_crate_dependencies = "warn"
+unused_extern_crates = "warn"
+unstable_features = "warn"
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
