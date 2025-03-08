@@ -1,23 +1,33 @@
 use dioxus::prelude::*;
+use tracing::error;
 
 // # Modules
 use crate::{
-    controller::products::fetch_products, model::pagination::PageSort,
-    view::components::product_item::product_item,
+    model::{pagination::PageSort, product::Products},
+    view::components::products::ProductsComponent,
 };
 
 #[allow(non_snake_case)]
 pub(crate) fn HomePage() -> Element {
-    let products = use_server_future(|| fetch_products(10, PageSort::Ascending))?;
-    let products = products().unwrap()?;
+    let mut products: Signal<Products> = use_signal(|| Products(vec![]));
 
+    // Get products asyncronously
+    let get_products: Resource<()> = use_resource(move || async move {
+        // Fetch products
+        let update: Products = Products::get(10, PageSort::Ascending)
+            .await
+            .unwrap_or_else(|err| {
+                error!("Error fetching products: {err}");
+                Products(vec![])
+            });
+
+        // Update the `products` signal
+        products.set(update);
+    });
+    get_products();
+
+    // # Render page
     rsx! {
-        section { class: "p-10",
-            for product in products {
-                product_item {
-                    product
-                }
-            }
-        }
+        ProductsComponent { products }
     }
 }

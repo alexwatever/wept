@@ -14,6 +14,10 @@ pub(crate) struct Product {
     pub(crate) rating: ProductRating,
 }
 
+/// # Products
+#[derive(Debug)]
+pub(crate) struct Products(pub Vec<Product>);
+
 /// # Product Rating
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub(crate) struct ProductRating {

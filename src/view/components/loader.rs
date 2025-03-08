@@ -1,5 +1,21 @@
 use dioxus::prelude::*;
 
+/// # Loader Component
+///
+/// This component displays a loading indicator.  
+///
+/// **Returns**  
+///
+/// The LoaderComponent element.
+#[component]
+pub fn LoaderComponent() -> Element {
+    rsx! {
+        div {
+            class: "spinner",
+        }
+    }
+}
+
 #[component]
 pub(crate) fn ChildrenOrLoading(children: Element) -> Element {
     rsx! {
@@ -13,20 +29,11 @@ pub(crate) fn ChildrenOrLoading(children: Element) -> Element {
                     if let Some(placeholder) = context.suspense_placeholder() {
                         {placeholder}
                     } else {
-                        LoadingIndicator {}
+                        LoaderComponent {}
                     }
                 }
             },
             {children}
-        }
-    }
-}
-
-#[component]
-fn LoadingIndicator() -> Element {
-    rsx! {
-        div {
-            class: "spinner",
         }
     }
 }

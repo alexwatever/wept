@@ -3050,6 +3050,7 @@ dependencies = [
  "parse-display",
  "reqwest",
  "serde",
+ "tracing",
 ]
 
 [[package]]
