@@ -1,0 +1,11 @@
+
+query PostsQuery($first: Int!, $after: String) {
+  posts(first: $first, after: $after) {
+    nodes {
+      id
+      content
+      slug
+      title
+    }
+  }
+}
