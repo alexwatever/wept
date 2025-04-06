@@ -1,2 +1,3 @@
 pub mod pagination;
-pub mod product;
+pub mod posts;
+pub mod products;

@@ -1,31 +1,38 @@
+use graphql_client::GraphQLQuery;
 use parse_display::FromStr;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display as FmtDisplay, Formatter, Result as FmtResult};
 
-/// # Product
+/// # Post
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
-pub(crate) struct Product {
-    pub(crate) id: u32,
-    pub(crate) title: String,
-    pub(crate) price: f32,
-    pub(crate) description: String,
-    pub(crate) category: String,
-    pub(crate) image: String,
-    pub(crate) rating: ProductRating,
+pub(crate) struct Post {
+    pub(crate) id: String,
+    pub(crate) content: Option<String>,
+    pub(crate) slug: Option<String>,
+    pub(crate) title: Option<String>,
 }
 
-/// # Products
+/// # Posts
 #[derive(Debug)]
-pub(crate) struct Products(pub Vec<Product>);
+pub(crate) struct Posts(pub Vec<Post>);
 
-/// # Product Rating
+/// # Posts GraphQL Query
+#[derive(GraphQLQuery, Debug)]
+#[graphql(
+    schema_path = "src/graphql/schema.graphql",
+    query_path = "src/graphql/posts_query.graphql",
+    response_derives = "Debug"
+)]
+pub struct PostsQuery;
+
+/// # Post Rating
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
-pub(crate) struct ProductRating {
+pub(crate) struct PostRating {
     pub(crate) rate: f32,
     pub(crate) count: u32,
 }
 
-impl FmtDisplay for ProductRating {
+impl FmtDisplay for PostRating {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         let rounded = self.rate.round() as usize;
         for _ in 0..rounded {
@@ -41,10 +48,10 @@ impl FmtDisplay for ProductRating {
     }
 }
 
-/// # Product Size
+/// # Post Size
 #[derive(Default, FromStr, Debug)]
 #[display(style = "snake_case")]
-pub(crate) enum ProductSize {
+pub(crate) enum PostSize {
     Small,
     #[default]
     Medium,

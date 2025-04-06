@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 // # Modules
 use crate::{
-    model::product::{Product, Products},
+    model::products::{Product, Products},
     view::components::{loader::LoaderComponent, product_item::product_item},
 };
 

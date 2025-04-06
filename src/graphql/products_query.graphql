@@ -1,0 +1,29 @@
+# Products
+# `$first` - The number of items to return after the referenced "after" cursor (ie. page size)
+# `$after` - Cursor used along with the "first" argument to reference where in the dataset to get data
+query ProductsQuery($first: Int!, $after: String) {
+  products(first: $first, after: $after) {
+    __typename
+    nodes {
+      __typename
+      id
+      sku
+      slug
+      name
+      status
+      description
+      # __typename
+      # ... on SimpleProduct {
+      #   onSale
+      #   stockStatus
+      #   price
+      #   rawPrice: price(format: RAW)
+      #   regularPrice
+      #   salePrice
+      #   stockStatus
+      #   stockQuantity
+      #   soldIndividually
+      # }
+    }
+  }
+}

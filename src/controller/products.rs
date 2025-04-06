@@ -1,81 +1,85 @@
 use dioxus::Result as DxResult;
-use graphql_client::{GraphQLQuery, Response};
-use reqwest::get;
+use graphql_client::{GraphQLQuery, QueryBody, Response};
+use reqwest::{get, Client};
 use tracing::info;
 
 // # Modules
-use crate::model::{
-    pagination::PageSort,
-    product::{Product, Products},
+use super::Controller;
+use crate::{
+    model::{
+        pagination::PageSort,
+        products::{
+            products_query::{ProductsQueryProductsNodes, ResponseData, Variables},
+            Product, Products, ProductsQuery,
+        },
+    },
+    State,
 };
 
-pub(crate) async fn _fetch_products(count: usize, sort: PageSort) -> DxResult<Vec<Product>> {
-    let url: String = format!("https://fakestoreapi.com/products/?sort={sort}&limit={count}");
+pub(crate) async fn fetch_product(product_id: usize) -> DxResult<Product> {
+    let url: String = format!("https://fakestoreapi.com/products/{product_id}");
+    let request: Product = get(&url).await?.json().await?;
+
+    Ok(request)
+}
+
+pub(crate) async fn _fetch_products(count: usize) -> DxResult<Vec<Product>> {
+    let url: String = format!("https://fakestoreapi.com/products/?sort=ASC&limit={count}");
 
     let request: Vec<Product> = get(&url).await?.json().await?;
 
     Ok(request)
 }
 
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/graphql/schema.graphql",
-    query_path = "src/graphql/query.graphql",
-    response_derives = "Debug"
-)]
-pub struct PostsQuery;
+impl Controller for Products {
+    type ReturnedEntity = Self;
 
-impl Products {
-    /// # Fetch Products
+    /// # Fetch a page of products
     ///
     /// Get a list of products from the WordPress GraphQL API.  
     ///
     /// **Arguments**  
-    ///
-    /// * `page_count` - The number of products to fetch.
-    /// * `page_sort` - The sort order of the products.
+    /// * `page_size` - The number of products to fetch.
+    /// * `sort_direction` - The direction to sort the products.
     ///
     /// **Returns**  
-    ///
     /// A list of products.
-    pub(crate) async fn get(page_count: usize, page_sort: PageSort) -> DxResult<Products> {
-        let posts_endpoint = "http://localhost:8080/graphql";
+    async fn get_page(
+        page_size: Option<usize>,
+        _sort_direction: Option<PageSort>,
+    ) -> DxResult<Self> {
+        // Build the payload
+        let first: i64 = page_size.unwrap_or(Self::PAGE_SIZE) as i64;
+        let payload: Variables = Variables { first, after: None };
+        let payload: QueryBody<Variables> = ProductsQuery::build_query(payload);
 
-        let payload: posts_query::Variables = posts_query::Variables {
-            first: page_count as i64,
-            after: None,
-        };
+        // Build the endpoint
+        let endpoint: String = format!(
+            "{host}/{path}",
+            host = State::get_backend_host(),
+            path = State::get_backend_path()
+        );
 
-        let request_body = PostsQuery::build_query(payload);
+        info!("Fetching products from {endpoint}");
 
-        let client = reqwest::Client::new();
+        // Make the request
+        let request = Client::new().post(endpoint).json(&payload).send().await?;
 
-        let res = client
-            .post(posts_endpoint)
-            .json(&request_body)
-            .send()
-            .await?;
+        info!("Received response from {request:?}");
 
-        let response_body: Response<posts_query::ResponseData> = res.json().await?;
-
-        let posts = response_body
+        // Parse the response
+        let products: Vec<ProductsQueryProductsNodes> = request
+            // Parse the response
+            .json::<Response<ResponseData>>()
+            // Get the products
+            .await?
             .data
             .expect("No data received")
-            .posts
-            .expect("No posts received")
+            .products
+            .expect("No products received")
             .nodes;
 
-        posts.into_iter().for_each(|post| {
-            info!("{:?}", post.id);
-            info!("{:?}", post.title);
-            info!("{:?}", post.content);
-            info!("{:?}", post.slug);
-        });
-
-        let dummy_endpoint: String =
-            format!("https://fakestoreapi.com/products/?sort={page_sort}&limit={page_count}");
-        let products: Vec<Product> = get(&dummy_endpoint).await?.json().await?;
-
-        Ok(Products(products))
+        // Build and return the products
+        Ok(products.into())
     }
 }

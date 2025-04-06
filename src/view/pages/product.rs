@@ -2,8 +2,8 @@ use dioxus::prelude::*;
 
 // # Modules
 use crate::{
-    controller::product::fetch_product,
-    model::product::{Product, ProductSize},
+    controller::products::fetch_product,
+    model::products::{Product, ProductSize},
 };
 
 #[component]
@@ -15,12 +15,12 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
     let product = use_server_future(move || fetch_product(product_id()))?;
 
     let Product {
-        title,
-        price,
+        id,
+        sku,
+        slug,
+        name,
+        status,
         description,
-        category,
-        image,
-        rating,
         ..
     } = product().unwrap()?;
 
@@ -35,10 +35,10 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
                                 href: "#",
                                 icons::icon_0 {}
                             }
-                            img { class: "object-cover w-full h-full",
-                                alt: "",
-                                src: "{image}",
-                            }
+                            // img { class: "object-cover w-full h-full",
+                            //     alt: "",
+                            //     src: "{image}",
+                            // }
                             a { class: "absolute top-1/2 right-0 mr-8 transform translate-1/2",
                                 href: "#",
                                 icons::icon_1 {}
@@ -49,18 +49,21 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
                         div { class: "lg:pl-20",
                             div { class: "mb-10 pb-10 border-b",
                                 h2 { class: "mt-2 mb-6 max-w-xl text-5xl md:text-6xl font-bold font-heading",
-                                    "{title}"
-                                }
-                                div { class: "mb-8",
-                                    "{rating}"
+                                    "{name:?}"
                                 }
                                 p { class: "inline-block mb-8 text-2xl font-bold font-heading text-blue-300",
                                     span {
-                                        "${price}"
+                                        "{slug:?}"
+                                    }
+                                    span {
+                                        "{id}"
+                                    }
+                                    span {
+                                        "{sku:?}"
                                     }
                                 }
                                 p { class: "max-w-md text-gray-500",
-                                    "{description}"
+                                    "{description:?}"
                                 }
                             }
                             div { class: "flex mb-12",
@@ -177,10 +180,10 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
                         }
                     }
                     h3 { class: "mb-8 text-3xl font-bold font-heading text-blue-300",
-                        "{category}"
+                        "{status:?}"
                     }
                     p { class: "max-w-2xl text-gray-500",
-                        "{description}"
+                        "{description:?}"
                     }
                 }
             }

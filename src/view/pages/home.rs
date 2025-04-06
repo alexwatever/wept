@@ -1,9 +1,10 @@
 use dioxus::prelude::*;
-use tracing::error;
+use tracing::{error, info};
 
 // # Modules
 use crate::{
-    model::{pagination::PageSort, product::Products},
+    controller::Controller,
+    model::{pagination::PageSort, products::Products},
     view::components::products::ProductsComponent,
 };
 
@@ -11,10 +12,12 @@ use crate::{
 pub(crate) fn HomePage() -> Element {
     let mut products: Signal<Products> = use_signal(|| Products(vec![]));
 
+    info!("Loaded Home page");
+
     // Get products asyncronously
     let get_products: Resource<()> = use_resource(move || async move {
         // Fetch products
-        let update: Products = Products::get(10, PageSort::Ascending)
+        let update: Products = Products::get_page(Some(10), Some(PageSort::Ascending))
             .await
             .unwrap_or_else(|err| {
                 error!("Error fetching products: {err}");
