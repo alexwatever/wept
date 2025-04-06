@@ -1,6 +1,6 @@
 [package]
 name = "wept"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 readme = "README.md"
 description = "Wept is a web application framework built on Dioxus."
@@ -9,7 +9,8 @@ authors = ["Alex Watson <alex@coded.cc>"]
 license = "MPL-2.0"
 
 [dependencies]
-dioxus = { version = "0.6.2", features = ["fullstack", "router"] }
+dioxus = { version = "0.6.3", features = ["fullstack", "router"] }
+envy = "0.4.2"
 graphql_client = { version = "0.14.0" }
 parse-display = { version = "0.10.0" }
 reqwest = { version = "0.12.5", features = ["json"] }
