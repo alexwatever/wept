@@ -9,10 +9,13 @@ use crate::view::components::entity_list::EntityDisplay;
 /// # Post
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub(crate) struct Post {
+    /// Base fields
     pub(crate) id: String,
     pub(crate) content: Option<String>,
     pub(crate) slug: Option<String>,
     pub(crate) title: Option<String>,
+    /// Additional fields
+    pub(crate) date: Option<String>,
 }
 
 /// # Posts
@@ -27,6 +30,15 @@ pub(crate) struct Posts(pub Vec<Post>);
     response_derives = "Debug"
 )]
 pub struct PostsQuery;
+
+/// # Post GraphQL Query
+#[derive(GraphQLQuery, Debug)]
+#[graphql(
+    schema_path = "src/graphql/schema.graphql",
+    query_path = "src/graphql/post_query.graphql",
+    response_derives = "Debug, Serialize, PartialEq, Eq"
+)]
+pub struct PostQuery;
 
 /// # Post Rating
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
@@ -75,7 +87,7 @@ impl EntityDisplay for Post {
             section { class: "p-2 m-2 shadow-lg ring-1 rounded-lg flex flex-row place-items-center hover:ring-4 hover:shadow-2xl transition-all duration-200",
                 div { class: "pl-4 text-left text-ellipsis",
                     a {
-                        href: "/posts/{id}",
+                        href: "/post/{slug.as_ref().unwrap_or(&id)}",
                         class: "w-full text-center font-bold text-xl",
                         "{title:?}"
                     }

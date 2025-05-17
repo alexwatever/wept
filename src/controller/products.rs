@@ -2,7 +2,7 @@ use std::io::ErrorKind;
 
 use dioxus::Result as DxResult;
 use graphql_client::{GraphQLQuery, Response};
-use reqwest::{get, Client};
+use reqwest::Client;
 use tracing::info;
 
 // # Modules
@@ -24,7 +24,7 @@ use crate::{
 /// Get a product from the WordPress GraphQL API by its slug.
 ///
 /// **Arguments**
-/// * `product_id` - The ID of the product to fetch.
+/// * `slug` - The slug of the product to fetch.
 ///
 /// **Returns**
 /// A product.
@@ -131,7 +131,6 @@ fn convert_product_from_query(product: product_query::ProductQueryProduct) -> Dx
                 downloadable: simple_product.downloadable,
                 download_limit: simple_product.download_limit.map(|l| l as i32),
             };
-            info!("Simple product price: {:?}", simple_product_data.price);
         }
         product_query::ProductQueryProductOn::VariableProduct(variable_product) => {
             info!(
@@ -199,21 +198,8 @@ fn convert_product_from_query(product: product_query::ProductQueryProduct) -> Dx
     Ok(product)
 }
 
-/// # Fetch a list of products
-///
-/// Get a list of products from the API.
-///
-/// **Arguments**
-/// * `count` - The number of products to fetch.
-///
-/// **Returns**
-/// A list of products.
-#[allow(dead_code)]
-pub(crate) async fn fetch_products(count: usize) -> DxResult<Vec<Product>> {
-    let url: String = format!("https://fakestoreapi.com/products/?sort=ASC&limit={count}");
-    let request: Vec<Product> = get(&url).await?.json().await?;
-    Ok(request)
-}
+// Removed placeholder fetch_products function -
+// The proper GraphQL implementation is provided through the Controller trait
 
 // Implement GraphQLEntity trait for Products
 impl GraphQLEntity for Products {

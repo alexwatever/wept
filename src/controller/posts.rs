@@ -1,31 +1,87 @@
+use std::io::ErrorKind;
+
 use dioxus::Result as DxResult;
-use graphql_client::Response;
+use graphql_client::{GraphQLQuery, Response};
+use reqwest::Client;
 
 // # Modules
 use super::{base::GraphQLEntity, Controller};
-use crate::model::{
-    pagination::PageSort,
-    posts::{posts_query, Post, Posts, PostsQuery},
+use crate::{
+    model::{
+        pagination::PageSort,
+        posts::{posts_query, Post, PostQuery, Posts, PostsQuery},
+    },
+    State,
 };
 
-/// # Fetch a single post by ID
+/// # Fetch a single post by ID or slug
 ///
-/// Get a post from the WordPress GraphQL API by its ID.
+/// Get a post from the WordPress GraphQL API by its ID or slug.
 ///
 /// **Arguments**
-/// * `post_id` - The ID of the post to fetch.
+/// * `slug` - The slug of the post to fetch.
 ///
 /// **Returns**
 /// A post.
-pub(crate) async fn fetch_post(post_id: String) -> DxResult<Post> {
-    // This is a placeholder implementation
-    // In a real implementation, you would use a GraphQL query to fetch the post by ID
+pub(crate) async fn fetch_post(slug: String) -> DxResult<Post> {
+    use crate::model::posts::post_query;
 
+    // Create variables for the GraphQL query
+    let variables = post_query::Variables {
+        post_slug: slug.clone(),
+    };
+
+    // Build the GraphQL query
+    let payload = PostQuery::build_query(variables);
+
+    // Build the endpoint
+    let endpoint = format!(
+        "{host}/{path}",
+        host = State::get_backend_host(),
+        path = State::get_backend_path()
+    );
+
+    // Make the request to the GraphQL API
+    let client = Client::new();
+    let response = client.post(endpoint).json(&payload).send().await?;
+
+    // Parse the response
+    let response_data: Response<post_query::ResponseData> = response.json().await?;
+
+    // Check if we have errors
+    if let Some(errors) = response_data.errors {
+        if !errors.is_empty() {
+            let error_msg = errors
+                .iter()
+                .map(|e| e.message.clone())
+                .collect::<Vec<String>>()
+                .join(", ");
+
+            // Use an error type that implements StdError
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("GraphQL error: {}", error_msg),
+            )
+            .into());
+        }
+    }
+
+    // Extract the post data
+    let data = response_data
+        .data
+        .ok_or_else(|| std::io::Error::new(ErrorKind::NotFound, "No data received"))?;
+
+    let post_data = data
+        .post
+        .ok_or_else(|| std::io::Error::new(ErrorKind::NotFound, "Post not found"))?;
+
+    // Convert the post data to a Post model
     let post = Post {
-        id: post_id,
-        content: Some("This is a sample post content fetched from the API.".to_string()),
-        slug: Some("sample-post".to_string()),
-        title: Some("Sample Post".to_string()),
+        id: post_data.id,
+        content: post_data.content,
+        slug: post_data.slug,
+        title: post_data.title,
+        date: post_data.date,
     };
 
     Ok(post)
@@ -95,6 +151,7 @@ impl From<posts_query::PostsQueryPostsNodes> for Post {
             title: post.title,
             content: post.content,
             slug: post.slug,
+            date: None,
         }
     }
 }

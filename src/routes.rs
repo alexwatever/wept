@@ -15,8 +15,8 @@ pub(crate) enum Routes {
     #[route("/product/:product_slug")]
     ProductPage { product_slug: String },
     
-    #[route("/posts/:post_id")]
-    PostPage { post_id: String },
+    #[route("/post/:post_slug")]
+    PostPage { post_slug: String },
     
     #[route("/:..route")]
     NotFoundPage { route: Vec<String> },
