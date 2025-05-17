@@ -5,5 +5,5 @@ pub enum PageSort {
     #[display("ASC")]
     Ascending,
     #[display("DESC")]
-    Descending,
+    _Descending,
 }

@@ -12,18 +12,42 @@ query ProductsQuery($first: Int!, $after: String) {
       name
       status
       description
-      # __typename
-      # ... on SimpleProduct {
-      #   onSale
-      #   stockStatus
-      #   price
-      #   rawPrice: price(format: RAW)
-      #   regularPrice
-      #   salePrice
-      #   stockStatus
-      #   stockQuantity
-      #   soldIndividually
-      # }
+      shortDescription
+      dateOnSaleFrom
+      dateOnSaleTo
+      featuredImageId
+      image {
+        id
+        sourceUrl
+        altText
+        title
+      }
+      galleryImages {
+        nodes {
+          id
+          sourceUrl
+          altText
+        }
+      }
+      ... on SimpleProduct {
+        onSale
+        stockStatus
+        price
+        rawPrice: price(format: RAW)
+        regularPrice
+        salePrice
+        stockQuantity
+        soldIndividually
+        reviewCount
+        weight
+        length
+        width
+        height
+        purchasable
+        virtual
+        downloadable
+        downloadLimit
+      }
     }
   }
 }

@@ -3,15 +3,12 @@ use dioxus::prelude::*;
 // # Modules
 use crate::{
     controller::products::fetch_product,
-    model::products::{Product, ProductSize},
+    model::products::{Product, SimpleProduct},
 };
 
 #[component]
 #[allow(non_snake_case)]
 pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
-    let mut quantity = use_signal(|| 1);
-    let mut size = use_signal(ProductSize::default);
-
     let product = use_server_future(move || fetch_product(product_id()))?;
 
     let Product {
@@ -21,8 +18,50 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
         name,
         status,
         description,
+        short_description,
+        image,
+        gallery_images,
+        simple_product,
         ..
     } = product().unwrap()?;
+
+    let SimpleProduct {
+        price,
+        sale_price,
+        regular_price,
+        on_sale,
+        stock_status,
+        stock_quantity,
+        review_count,
+        weight,
+        ..
+    } = simple_product.unwrap();
+
+    // Product image source
+    let image_src = image
+        .as_ref()
+        .and_then(|img| img.source_url.clone())
+        .unwrap_or_default();
+
+    // Format price display
+    let price_display = if on_sale.unwrap_or(false) {
+        format!(
+            "{} (Sale: {})",
+            regular_price.unwrap_or_default(),
+            sale_price.unwrap_or_default()
+        )
+    } else {
+        price.unwrap_or_default()
+    };
+
+    // Format stock status
+    let stock_info = match (stock_status.as_deref(), stock_quantity) {
+        (Some("IN_STOCK"), Some(qty)) if qty > 0 => format!("In Stock ({} available)", qty),
+        (Some("IN_STOCK"), _) => "In Stock".to_string(),
+        (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
+        (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
+        _ => "Status Unknown".to_string(),
+    };
 
     rsx! {
         section { class: "py-20",
@@ -35,13 +74,34 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
                                 href: "#",
                                 icons::icon_0 {}
                             }
-                            // img { class: "object-cover w-full h-full",
-                            //     alt: "",
-                            //     src: "{image}",
-                            // }
+                            img {
+                                class: "object-cover w-full h-full",
+                                alt: "{name.clone().unwrap_or_default()}",
+                                src: "{image_src}",
+                            }
                             a { class: "absolute top-1/2 right-0 mr-8 transform translate-1/2",
                                 href: "#",
                                 icons::icon_1 {}
+                            }
+                        }
+                        // Gallery thumbnails if available
+                        {
+                            if let Some(gallery) = gallery_images.as_ref() {
+                                rsx! {
+                                    div { class: "flex -mx-2",
+                                        for img in gallery.iter().take(4) {
+                                            div { class: "w-1/4 px-2",
+                                                img {
+                                                    class: "w-full h-24 object-cover rounded",
+                                                    src: "{img.source_url.clone().unwrap_or_default()}",
+                                                    alt: "{img.alt_text.clone().unwrap_or_default()}"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                rsx! { "" }
                             }
                         }
                     }
@@ -49,69 +109,41 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
                         div { class: "lg:pl-20",
                             div { class: "mb-10 pb-10 border-b",
                                 h2 { class: "mt-2 mb-6 max-w-xl text-5xl md:text-6xl font-bold font-heading",
-                                    "{name:?}"
+                                    "{name.clone().unwrap_or_default()}"
                                 }
-                                p { class: "inline-block mb-8 text-2xl font-bold font-heading text-blue-300",
+                                // Price
+                                p { class: "inline-block mb-4 text-2xl font-bold font-heading text-blue-500",
+                                    "{price_display}"
+                                }
+                                // Stock status
+                                p { class: "mb-8 text-sm",
                                     span {
-                                        "{slug:?}"
-                                    }
-                                    span {
-                                        "{id}"
-                                    }
-                                    span {
-                                        "{sku:?}"
+                                        class: if stock_status.as_deref() == Some("IN_STOCK") { "text-green-600 font-semibold" } else { "text-red-600 font-semibold" },
+                                        "{stock_info}"
                                     }
                                 }
-                                p { class: "max-w-md text-gray-500",
-                                    "{description:?}"
-                                }
-                            }
-                            div { class: "flex mb-12",
-                                div { class: "mr-6",
-                                    span { class: "block mb-4 font-bold font-heading text-gray-400 uppercase",
-                                        "QTY"
-                                    }
-                                    div { class: "inline-flex items-center px-4 font-semibold font-heading text-gray-500 border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md",
-                                        button { class: "py-2 hover:text-gray-700",
-                                            onclick: move |_| quantity += 1,
-                                            icons::icon_2 {}
-                                        }
-                                        input { class: "w-12 m-0 px-2 py-4 text-center md:text-right border-0 focus:ring-transparent focus:outline-none rounded-md",
-                                            placeholder: "1",
-                                            r#type: "number",
-                                            value: "{quantity}",
-                                            oninput: move |evt| if let Ok(as_number) = evt.value().parse() { quantity.set(as_number) },
-                                        }
-                                        button { class: "py-2 hover:text-gray-700",
-                                            onclick: move |_| quantity -= 1,
-                                            icons::icon_3 {}
-                                        }
-                                    }
-                                }
-                                div {
-                                    span { class: "block mb-4 font-bold font-heading text-gray-400 uppercase",
-                                        "Size"
-                                    }
-                                    select { class: "pl-6 pr-10 py-4 font-semibold font-heading text-gray-500 border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md",
-                                        id: "",
-                                        name: "",
-                                        onchange: move |evt| {
-                                            if let Ok(new_size) = evt.value().parse() {
-                                                size.set(new_size);
+                                // Short description
+                                {
+                                    if let Some(short_desc) = short_description.as_ref() {
+                                        rsx! {
+                                            p { class: "max-w-md mb-8 text-gray-500",
+                                                "{short_desc}"
                                             }
-                                        },
-                                        option {
-                                            value: "1",
-                                            "Medium"
                                         }
-                                        option {
-                                            value: "2",
-                                            "Small"
+                                    } else {
+                                        rsx! { "" }
+                                    }
+                                }
+                                // Product SKU
+                                {
+                                    if let Some(sku_val) = sku.as_ref() {
+                                        rsx! {
+                                            p { class: "text-sm text-gray-400",
+                                                "SKU: {sku_val}"
+                                            }
                                         }
-                                        option {
-                                            value: "3",
-                                            "Large"
-                                        }
+                                    } else {
+                                        rsx! { "" }
                                     }
                                 }
                             }
@@ -180,10 +212,34 @@ pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
                         }
                     }
                     h3 { class: "mb-8 text-3xl font-bold font-heading text-blue-300",
-                        "{status:?}"
+                        "{name.clone().unwrap_or_default()} Details"
                     }
-                    p { class: "max-w-2xl text-gray-500",
-                        "{description:?}"
+                    // Full description
+                    div { class: "max-w-2xl text-gray-500 mb-10",
+                        dangerous_inner_html: "{description.clone().unwrap_or_default()}"
+                    }
+                    // Additional details
+                    {
+                        if weight.is_some() {
+                            rsx! {
+                                div { class: "mb-10",
+                                    h4 { class: "mb-4 text-xl font-bold", "Specifications" }
+                                    table { class: "w-full border-collapse",
+                                        tbody {
+                                            // Weight
+                                            if let Some(w) = weight.as_ref() {
+                                                tr { class: "border-b",
+                                                    td { class: "py-2 pr-4 font-semibold", "Weight" }
+                                                    td { class: "py-2 pl-4", "{w}" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            rsx! { "" }
+                        }
                     }
                 }
             }

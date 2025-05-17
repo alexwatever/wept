@@ -1,17 +1,64 @@
 use dioxus::Result as DxResult;
-use graphql_client::{GraphQLQuery, QueryBody, Response};
-use reqwest::Client;
+use graphql_client::Response;
 
 // # Modules
-use super::Controller;
-use crate::{
-    model::{
-        pagination::PageSort,
-        posts::{posts_query, Post, Posts, PostsQuery},
-    },
-    State,
+use super::{base::GraphQLEntity, Controller};
+use crate::model::{
+    pagination::PageSort,
+    posts::{posts_query, Post, Posts, PostsQuery},
 };
 
+/// # Fetch a single post by ID
+///
+/// Get a post from the WordPress GraphQL API by its ID.
+///
+/// **Arguments**
+/// * `post_id` - The ID of the post to fetch.
+///
+/// **Returns**
+/// A post.
+pub(crate) async fn fetch_post(post_id: String) -> DxResult<Post> {
+    // This is a placeholder implementation
+    // In a real implementation, you would use a GraphQL query to fetch the post by ID
+
+    let post = Post {
+        id: post_id,
+        content: Some("This is a sample post content fetched from the API.".to_string()),
+        slug: Some("sample-post".to_string()),
+        title: Some("Sample Post".to_string()),
+    };
+
+    Ok(post)
+}
+
+// Implement GraphQLEntity trait for Posts
+impl GraphQLEntity for Posts {
+    type Variables = posts_query::Variables;
+    type Query = PostsQuery;
+    type ResponseData = posts_query::ResponseData;
+    type Nodes = posts_query::PostsQueryPostsNodes;
+
+    fn extract_nodes(response: Response<Self::ResponseData>) -> DxResult<Vec<Self::Nodes>> {
+        let nodes = response
+            .data
+            .expect("No data received")
+            .posts
+            .expect("No posts received")
+            .nodes;
+
+        Ok(nodes)
+    }
+
+    fn from_nodes(nodes: Vec<Self::Nodes>) -> Self {
+        Self::from(nodes)
+    }
+
+    fn create_variables(first: i64, after: Option<String>) -> Self::Variables {
+        posts_query::Variables { first, after }
+    }
+}
+
+// Implement Controller trait for Posts
 impl Controller for Posts {
     type ReturnedEntity = Posts;
 
@@ -27,39 +74,9 @@ impl Controller for Posts {
     /// A list of posts.
     async fn get_page(
         page_size: Option<usize>,
-        _sort_direction: Option<PageSort>,
+        sort_direction: Option<PageSort>,
     ) -> DxResult<Posts> {
-        // Build the payload
-        let first = page_size.unwrap_or(Self::PAGE_SIZE) as i64;
-        let payload = posts_query::Variables { first, after: None };
-        let payload: QueryBody<posts_query::Variables> = PostsQuery::build_query(payload);
-
-        // Build the endpoint
-        let endpoint: String = format!(
-            "{host}/{path}",
-            host = State::get_backend_host(),
-            path = State::get_backend_path()
-        );
-
-        // Make the request
-        let request = Client::new().post(endpoint).json(&payload).send().await?;
-
-        // Parse the response
-        let posts: Vec<posts_query::PostsQueryPostsNodes> = request
-            // Parse the response
-            .json::<Response<posts_query::ResponseData>>()
-            // Get the posts
-            .await?
-            .data
-            .expect("No data received")
-            .posts
-            .expect("No posts received")
-            .nodes;
-
-        // Build the posts
-        let posts: Posts = posts.into();
-
-        Ok(posts)
+        Self::make_request(page_size, sort_direction).await
     }
 }
 

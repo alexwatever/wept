@@ -1,6 +1,6 @@
 use dioxus::{launch, prelude::*};
 use serde::Deserialize;
-use tracing::{error, warn};
+use tracing::warn;
 
 // # Modules
 mod controller;
@@ -54,9 +54,6 @@ impl State {
     ///
     /// Get the backend host from the configuration.
     pub fn get_backend_host() -> String {
-        // In WASM context, use the GlobalSignal or fallback
-        let state = STATE.try_read();
-
         #[cfg(target_family = "wasm")]
         {
             // In WASM context, use the GlobalSignal or fallback
@@ -64,7 +61,7 @@ impl State {
             match state {
                 Ok(state) => state.env.backend_host.clone(),
                 Err(err) => {
-                    error!("Error reading state for backend host: {err}");
+                    tracing::error!("Error reading state for backend host: {err}");
                     Env::backend_host_default()
                 }
             }
@@ -72,8 +69,7 @@ impl State {
 
         #[cfg(not(target_family = "wasm"))]
         {
-            let value = STATE.signal();
-            let value = value.read();
+            let value = STATE.read();
             value.env.backend_host.clone()
         }
     }
@@ -89,7 +85,7 @@ impl State {
             match state {
                 Ok(state) => state.env.backend_path.clone(),
                 Err(err) => {
-                    error!("Error reading state for backend path: {err}");
+                    tracing::error!("Error reading state for backend path: {err}");
                     Env::backend_path_default()
                 }
             }

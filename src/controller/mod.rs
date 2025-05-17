@@ -1,6 +1,7 @@
 use dioxus::Result;
 
 // # Modules
+pub mod base;
 pub mod posts;
 pub mod products;
 use crate::model::pagination::PageSort;

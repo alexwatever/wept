@@ -1,0 +1,2 @@
+# Enable checks for the `target_family = "wasm"` feature
+check.targets = ["*"]
