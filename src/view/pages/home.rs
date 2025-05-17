@@ -15,10 +15,14 @@ pub(crate) fn HomePage() -> Element {
     let mut products: Signal<ProductsModel> = use_signal(|| ProductsModel(vec![]));
     let mut posts: Signal<PostsModel> = use_signal(|| PostsModel(vec![]));
 
-    info!("Loaded Home page");
+    use_effect(move || {
+        info!("Home page mounted (from use_effect, runs once)");
+        // Return a cleanup function if needed
+        // || info!("Home page unmounted")
+    });
 
     // Get products asyncronously
-    let get_products: Resource<()> = use_resource(move || async move {
+    let _get_products: Resource<()> = use_resource(move || async move {
         // Fetch products
         let update: ProductsModel = ProductsModel::get_page(Some(10), Some(PageSort::Ascending))
             .await
@@ -30,10 +34,9 @@ pub(crate) fn HomePage() -> Element {
         // Update the `products` signal
         products.set(update);
     });
-    get_products();
 
     // Get posts asyncronously
-    let get_posts: Resource<()> = use_resource(move || async move {
+    let _get_posts: Resource<()> = use_resource(move || async move {
         // Fetch posts
         let update: PostsModel = PostsModel::get_page(Some(10), Some(PageSort::Ascending))
             .await
@@ -45,7 +48,6 @@ pub(crate) fn HomePage() -> Element {
         // Update the `posts` signal
         posts.set(update);
     });
-    get_posts();
 
     // # Render page
     rsx! {

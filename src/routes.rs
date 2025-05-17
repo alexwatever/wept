@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 
 // # Modules
-use crate::view::pages::{errors::NotFoundPage, home::HomePage, post::PostPage, product::ProductPage};
+use crate::view::pages::{
+    errors::NotFoundPage, home::HomePage, post::PostPage, product::ProductPage,
+};
 
 #[derive(Clone, Routable, Debug, PartialEq)]
 #[rustfmt::skip]
@@ -10,8 +12,8 @@ pub(crate) enum Routes {
     #[route("/")]
     HomePage {},
 
-    #[route("/products/:product_id")]
-    ProductPage { product_id: usize },
+    #[route("/product/:product_slug")]
+    ProductPage { product_slug: String },
     
     #[route("/posts/:post_id")]
     PostPage { post_id: String },

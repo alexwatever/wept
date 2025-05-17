@@ -1,0 +1,66 @@
+# Product by slug
+# `$slug` - The product slug
+query ProductQuery($slug: ID!) {
+  product(id: $slug, idType: SLUG) {
+    __typename
+    id
+    sku
+    slug
+    name
+    status
+    description
+    shortDescription
+    dateOnSaleFrom
+    dateOnSaleTo
+    featuredImageId
+    image {
+      __typename
+      id
+      sourceUrl
+      altText
+      title
+    }
+    galleryImages {
+      __typename
+      nodes {
+        __typename
+        id
+        sourceUrl
+        altText
+      }
+    }
+    ... on SimpleProduct {
+      __typename
+      onSale
+      stockStatus
+      price
+      rawPrice: price(format: RAW)
+      regularPrice
+      salePrice
+      stockQuantity
+      soldIndividually
+      reviewCount
+      weight
+      length
+      width
+      height
+      purchasable
+      virtual
+      downloadable
+      downloadLimit
+    }
+    ... on VariableProduct {
+      __typename
+      onSale
+      stockStatus
+    }
+    ... on ExternalProduct {
+      __typename
+      onSale
+      externalUrl
+    }
+    ... on GroupProduct {
+      __typename
+    }
+  }
+}

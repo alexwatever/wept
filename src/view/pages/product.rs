@@ -1,244 +1,275 @@
 use dioxus::prelude::*;
 
 // # Modules
-use crate::{
-    controller::products::fetch_product,
-    model::products::{Product, SimpleProduct},
-};
+use crate::{controller::products::fetch_product, model::products::Product};
 
 #[component]
 #[allow(non_snake_case)]
-pub(crate) fn ProductPage(product_id: ReadOnlySignal<usize>) -> Element {
-    let product = use_server_future(move || fetch_product(product_id()))?;
+pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
+    let product = use_resource(move || async move { fetch_product(product_slug()).await });
 
-    let Product {
-        id,
-        sku,
-        slug,
-        name,
-        status,
-        description,
-        short_description,
-        image,
-        gallery_images,
-        simple_product,
-        ..
-    } = product().unwrap()?;
-
-    let SimpleProduct {
-        price,
-        sale_price,
-        regular_price,
-        on_sale,
-        stock_status,
-        stock_quantity,
-        review_count,
-        weight,
-        ..
-    } = simple_product.unwrap();
-
-    // Product image source
-    let image_src = image
-        .as_ref()
-        .and_then(|img| img.source_url.clone())
-        .unwrap_or_default();
-
-    // Format price display
-    let price_display = if on_sale.unwrap_or(false) {
-        format!(
-            "{} (Sale: {})",
-            regular_price.unwrap_or_default(),
-            sale_price.unwrap_or_default()
-        )
-    } else {
-        price.unwrap_or_default()
-    };
-
-    // Format stock status
-    let stock_info = match (stock_status.as_deref(), stock_quantity) {
-        (Some("IN_STOCK"), Some(qty)) if qty > 0 => format!("In Stock ({} available)", qty),
-        (Some("IN_STOCK"), _) => "In Stock".to_string(),
-        (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
-        (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
-        _ => "Status Unknown".to_string(),
-    };
-
-    rsx! {
-        section { class: "py-20",
-            div { class: "container mx-auto px-4",
-                div { class: "flex flex-wrap -mx-4 mb-24",
-                    div { class: "w-full md:w-1/2 px-4 mb-8 md:mb-0",
-                        div { class: "relative mb-10",
-                            style: "height: 564px;",
-                            a { class: "absolute top-1/2 left-0 ml-8 transform translate-1/2",
-                                href: "#",
-                                icons::icon_0 {}
-                            }
-                            img {
-                                class: "object-cover w-full h-full",
-                                alt: "{name.clone().unwrap_or_default()}",
-                                src: "{image_src}",
-                            }
-                            a { class: "absolute top-1/2 right-0 mr-8 transform translate-1/2",
-                                href: "#",
-                                icons::icon_1 {}
-                            }
-                        }
-                        // Gallery thumbnails if available
-                        {
-                            if let Some(gallery) = gallery_images.as_ref() {
-                                rsx! {
-                                    div { class: "flex -mx-2",
-                                        for img in gallery.iter().take(4) {
-                                            div { class: "w-1/4 px-2",
-                                                img {
-                                                    class: "w-full h-24 object-cover rounded",
-                                                    src: "{img.source_url.clone().unwrap_or_default()}",
-                                                    alt: "{img.alt_text.clone().unwrap_or_default()}"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                rsx! { "" }
-                            }
-                        }
-                    }
-                    div { class: "w-full md:w-1/2 px-4",
-                        div { class: "lg:pl-20",
-                            div { class: "mb-10 pb-10 border-b",
-                                h2 { class: "mt-2 mb-6 max-w-xl text-5xl md:text-6xl font-bold font-heading",
-                                    "{name.clone().unwrap_or_default()}"
-                                }
-                                // Price
-                                p { class: "inline-block mb-4 text-2xl font-bold font-heading text-blue-500",
-                                    "{price_display}"
-                                }
-                                // Stock status
-                                p { class: "mb-8 text-sm",
-                                    span {
-                                        class: if stock_status.as_deref() == Some("IN_STOCK") { "text-green-600 font-semibold" } else { "text-red-600 font-semibold" },
-                                        "{stock_info}"
-                                    }
-                                }
-                                // Short description
-                                {
-                                    if let Some(short_desc) = short_description.as_ref() {
-                                        rsx! {
-                                            p { class: "max-w-md mb-8 text-gray-500",
-                                                "{short_desc}"
-                                            }
-                                        }
-                                    } else {
-                                        rsx! { "" }
-                                    }
-                                }
-                                // Product SKU
-                                {
-                                    if let Some(sku_val) = sku.as_ref() {
-                                        rsx! {
-                                            p { class: "text-sm text-gray-400",
-                                                "SKU: {sku_val}"
-                                            }
-                                        }
-                                    } else {
-                                        rsx! { "" }
-                                    }
-                                }
-                            }
-                            div { class: "flex flex-wrap -mx-4 mb-14 items-center",
-                                div { class: "w-full xl:w-2/3 px-4 mb-4 xl:mb-0",
-                                    a { class: "block bg-orange-300 hover:bg-orange-400 text-center text-white font-bold font-heading py-5 px-8 rounded-md uppercase transition duration-200",
-                                        href: "#",
-                                        "Add to cart"
-                                    }
-                                }
-                            }
-                            div { class: "flex items-center",
-                                span { class: "mr-8 text-gray-500 font-bold font-heading uppercase",
-                                    "SHARE IT"
-                                }
-                                a { class: "mr-1 w-8 h-8",
-                                    href: "#",
-                                    img {
-                                        alt: "",
-                                        src: "https://shuffle.dev/yofte-assets/buttons/facebook-circle.svg",
-                                    }
-                                }
-                                a { class: "mr-1 w-8 h-8",
-                                    href: "#",
-                                    img {
-                                        alt: "",
-                                        src: "https://shuffle.dev/yofte-assets/buttons/instagram-circle.svg",
-                                    }
-                                }
-                                a { class: "w-8 h-8",
-                                    href: "#",
-                                    img {
-                                        src: "https://shuffle.dev/yofte-assets/buttons/twitter-circle.svg",
-                                        alt: "",
-                                    }
-                                }
-                            }
-                        }
-                    }
+    let product_data = product.read();
+    match product_data.as_ref() {
+        None => rsx! { // Loading state
+            div { class: "container mx-auto px-4 py-20 flex justify-center",
+                div { class: "animate-pulse",
+                    h2 { class: "text-2xl font-bold", "Loading Product..." }
                 }
-                div {
-                    ul { class: "flex flex-wrap mb-16 border-b-2",
-                        li { class: "w-1/2 md:w-auto",
-                            a { class: "inline-block py-6 px-10 bg-white text-gray-500 font-bold font-heading shadow-2xl",
-                                href: "#",
-                                "Description"
-                            }
-                        }
-                        li { class: "w-1/2 md:w-auto",
-                            a { class: "inline-block py-6 px-10 text-gray-500 font-bold font-heading",
-                                href: "#",
-                                "Customer reviews"
-                            }
-                        }
-                        li { class: "w-1/2 md:w-auto",
-                            a { class: "inline-block py-6 px-10 text-gray-500 font-bold font-heading",
-                                href: "#",
-                                "Shipping &amp; returns"
-                            }
-                        }
-                        li { class: "w-1/2 md:w-auto",
-                            a { class: "inline-block py-6 px-10 text-gray-500 font-bold font-heading",
-                                href: "#",
-                                "Brand"
-                            }
+            }
+        },
+        Some(Err(error)) => rsx! { // Error state
+            div { class: "container mx-auto px-4 py-20",
+                h2 { class: "text-3xl font-bold text-red-500", "Error Loading Product" }
+                p { class: "text-lg", "There was an error loading the product: {error}" }
+                a {
+                    class: "mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
+                    href: "/",
+                    "Return to Home"
+                }
+            }
+        },
+        Some(Ok(p)) => {
+            let Product {
+                sku,
+                name,
+                description,
+                short_description,
+                image,
+                gallery_images,
+                simple_product,
+                ..
+            } = p;
+
+            if simple_product.is_none() {
+                return rsx! {
+                    div { class: "container mx-auto px-4 py-20",
+                        h2 { class: "text-3xl font-bold text-red-500", "Product Not Available" }
+                        p { class: "text-lg", "This product is not available or has incomplete data." }
+                        a {
+                            class: "mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
+                            href: "/",
+                            "Return to Home"
                         }
                     }
-                    h3 { class: "mb-8 text-3xl font-bold font-heading text-blue-300",
-                        "{name.clone().unwrap_or_default()} Details"
-                    }
-                    // Full description
-                    div { class: "max-w-2xl text-gray-500 mb-10",
-                        dangerous_inner_html: "{description.clone().unwrap_or_default()}"
-                    }
-                    // Additional details
-                    {
-                        if weight.is_some() {
-                            rsx! {
-                                div { class: "mb-10",
-                                    h4 { class: "mb-4 text-xl font-bold", "Specifications" }
-                                    table { class: "w-full border-collapse",
-                                        tbody {
-                                            // Weight
-                                            if let Some(w) = weight.as_ref() {
-                                                tr { class: "border-b",
-                                                    td { class: "py-2 pr-4 font-semibold", "Weight" }
-                                                    td { class: "py-2 pl-4", "{w}" }
+                };
+            }
+
+            // Get SimpleProduct values
+            let simple_product_data = simple_product.as_ref().unwrap();
+            let price = &simple_product_data.price;
+            let sale_price = &simple_product_data.sale_price;
+            let regular_price = &simple_product_data.regular_price;
+            let on_sale = simple_product_data.on_sale;
+            let stock_status = &simple_product_data.stock_status;
+            let stock_quantity = simple_product_data.stock_quantity;
+            let weight = &simple_product_data.weight;
+
+            // Product image source
+            let image_src = image
+                .as_ref()
+                .and_then(|img| img.source_url.clone())
+                .unwrap_or_default();
+
+            // Format price display
+            let price_display = if on_sale.unwrap_or(false) {
+                format!(
+                    "{} (Sale: {})",
+                    regular_price.as_ref().unwrap_or(&String::new()),
+                    sale_price.as_ref().unwrap_or(&String::new())
+                )
+            } else {
+                price.as_ref().unwrap_or(&String::new()).clone()
+            };
+
+            // Format stock status
+            let stock_info = match (stock_status.as_deref(), stock_quantity) {
+                (Some("IN_STOCK"), Some(qty)) if qty > 0 => {
+                    format!("In Stock ({} available)", qty)
+                }
+                (Some("IN_STOCK"), _) => "In Stock".to_string(),
+                (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
+                (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
+                _ => "Status Unknown".to_string(),
+            };
+
+            rsx! {
+                section { class: "py-20",
+                    div { class: "container mx-auto px-4",
+                        div { class: "flex flex-wrap -mx-4 mb-24",
+                            div { class: "w-full md:w-1/2 px-4 mb-8 md:mb-0",
+                                div { class: "relative mb-10",
+                                    style: "height: 564px;",
+                                    a { class: "absolute top-1/2 left-0 ml-8 transform translate-1/2",
+                                        href: "#",
+                                        icons::icon_0 {}
+                                    }
+                                    img {
+                                        class: "object-cover w-full h-full",
+                                        alt: "{name.clone().unwrap_or_default()}",
+                                        src: "{image_src}",
+                                    }
+                                    a { class: "absolute top-1/2 right-0 mr-8 transform translate-1/2",
+                                        href: "#",
+                                        icons::icon_1 {}
+                                    }
+                                }
+                                // Gallery thumbnails if available
+                                {
+                                    if let Some(gallery) = gallery_images.as_ref() {
+                                        rsx! {
+                                            div { class: "flex -mx-2",
+                                                for img in gallery.iter().take(4) {
+                                                    div { class: "w-1/4 px-2",
+                                                        img {
+                                                            class: "w-full h-24 object-cover rounded",
+                                                            src: "{img.source_url.clone().unwrap_or_default()}",
+                                                            alt: "{img.alt_text.clone().unwrap_or_default()}"
+                                                        }
+                                                    }
                                                 }
+                                            }
+                                        }
+                                    } else {
+                                        rsx! { "" }
+                                    }
+                                }
+                            }
+                            div { class: "w-full md:w-1/2 px-4",
+                                div { class: "lg:pl-20",
+                                    div { class: "mb-10 pb-10 border-b",
+                                        h2 { class: "mt-2 mb-6 max-w-xl text-5xl md:text-6xl font-bold font-heading",
+                                            "{name.clone().unwrap_or_default()}"
+                                        }
+                                        // Price
+                                        p { class: "inline-block mb-4 text-2xl font-bold font-heading text-blue-500",
+                                            "{price_display}"
+                                        }
+                                        // Stock status
+                                        p { class: "mb-8 text-sm",
+                                            span {
+                                                class: if stock_status.as_deref() == Some("IN_STOCK") { "text-green-600 font-semibold" } else { "text-red-600 font-semibold" },
+                                                "{stock_info}"
+                                            }
+                                        }
+                                        // Short description
+                                        {
+                                            if let Some(short_desc) = short_description.as_ref() {
+                                                rsx! {
+                                                    p { class: "max-w-md mb-8 text-gray-500",
+                                                        "{short_desc}"
+                                                    }
+                                                }
+                                            } else {
+                                                rsx! { "" }
+                                            }
+                                        }
+                                        // Product SKU
+                                        {
+                                            if let Some(sku_val) = sku.as_ref() {
+                                                rsx! {
+                                                    p { class: "text-sm text-gray-400",
+                                                        "SKU: {sku_val}"
+                                                    }
+                                                }
+                                            } else {
+                                                rsx! { "" }
+                                            }
+                                        }
+                                    }
+                                    div { class: "flex flex-wrap -mx-4 mb-14 items-center",
+                                        div { class: "w-full xl:w-2/3 px-4 mb-4 xl:mb-0",
+                                            a { class: "block bg-orange-300 hover:bg-orange-400 text-center text-white font-bold font-heading py-5 px-8 rounded-md uppercase transition duration-200",
+                                                href: "#",
+                                                "Add to cart"
+                                            }
+                                        }
+                                    }
+                                    div { class: "flex items-center",
+                                        span { class: "mr-8 text-gray-500 font-bold font-heading uppercase",
+                                            "SHARE IT"
+                                        }
+                                        a { class: "mr-1 w-8 h-8",
+                                            href: "#",
+                                            img {
+                                                alt: "",
+                                                src: "https://shuffle.dev/yofte-assets/buttons/facebook-circle.svg",
+                                            }
+                                        }
+                                        a { class: "mr-1 w-8 h-8",
+                                            href: "#",
+                                            img {
+                                                alt: "",
+                                                src: "https://shuffle.dev/yofte-assets/buttons/instagram-circle.svg",
+                                            }
+                                        }
+                                        a { class: "w-8 h-8",
+                                            href: "#",
+                                            img {
+                                                src: "https://shuffle.dev/yofte-assets/buttons/twitter-circle.svg",
+                                                alt: "",
                                             }
                                         }
                                     }
                                 }
                             }
-                        } else {
-                            rsx! { "" }
+                        }
+                        div {
+                            ul { class: "flex flex-wrap mb-16 border-b-2",
+                                li { class: "w-1/2 md:w-auto",
+                                    a { class: "inline-block py-6 px-10 bg-white text-gray-500 font-bold font-heading shadow-2xl",
+                                        href: "#",
+                                        "Description"
+                                    }
+                                }
+                                li { class: "w-1/2 md:w-auto",
+                                    a { class: "inline-block py-6 px-10 text-gray-500 font-bold font-heading",
+                                        href: "#",
+                                        "Customer reviews"
+                                    }
+                                }
+                                li { class: "w-1/2 md:w-auto",
+                                    a { class: "inline-block py-6 px-10 text-gray-500 font-bold font-heading",
+                                        href: "#",
+                                        "Shipping &amp; returns"
+                                    }
+                                }
+                                li { class: "w-1/2 md:w-auto",
+                                    a { class: "inline-block py-6 px-10 text-gray-500 font-bold font-heading",
+                                        href: "#",
+                                        "Brand"
+                                    }
+                                }
+                            }
+                            h3 { class: "mb-8 text-3xl font-bold font-heading text-blue-300",
+                                "{name.clone().unwrap_or_default()} Details"
+                            }
+                            // Full description
+                            div { class: "max-w-2xl text-gray-500 mb-10",
+                                dangerous_inner_html: "{description.clone().unwrap_or_default()}"
+                            }
+                            // Additional details
+                            {
+                                if weight.is_some() {
+                                    rsx! {
+                                        div { class: "mb-10",
+                                            h4 { class: "mb-4 text-xl font-bold", "Specifications" }
+                                            table { class: "w-full border-collapse",
+                                                tbody {
+                                                    // Weight
+                                                    if let Some(w) = weight.as_ref() {
+                                                        tr { class: "border-b",
+                                                            td { class: "py-2 pr-4 font-semibold", "Weight" }
+                                                            td { class: "py-2 pl-4", "{w}" }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    rsx! { "" }
+                                }
+                            }
                         }
                     }
                 }
@@ -282,57 +313,6 @@ mod icons {
                     stroke_width: "1.5",
                     stroke_linecap: "round",
                     stroke_linejoin: "round",
-                }
-            }
-        }
-    }
-
-    pub(super) fn icon_2() -> Element {
-        rsx! {
-            svg {
-                view_box: "0 0 12 12",
-                height: "12",
-                width: "12",
-                fill: "none",
-                xmlns: "http://www.w3.org/2000/svg",
-                g {
-                    opacity: "0.35",
-                    rect {
-                        height: "12",
-                        x: "5",
-                        fill: "currentColor",
-                        width: "2",
-                    }
-                    rect {
-                        fill: "currentColor",
-                        width: "2",
-                        height: "12",
-                        x: "12",
-                        y: "5",
-                        transform: "rotate(90 12 5)",
-                    }
-                }
-            }
-        }
-    }
-
-    pub(super) fn icon_3() -> Element {
-        rsx! {
-            svg {
-                width: "12",
-                fill: "none",
-                view_box: "0 0 12 2",
-                height: "2",
-                xmlns: "http://www.w3.org/2000/svg",
-                g {
-                    opacity: "0.35",
-                    rect {
-                        transform: "rotate(90 12 0)",
-                        height: "12",
-                        fill: "currentColor",
-                        x: "12",
-                        width: "2",
-                    }
                 }
             }
         }

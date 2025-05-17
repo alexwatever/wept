@@ -107,6 +107,15 @@ pub(crate) struct Products(pub Vec<Product>);
 )]
 pub struct ProductsQuery;
 
+/// # Product GraphQL Query
+#[derive(GraphQLQuery, Debug)]
+#[graphql(
+    schema_path = "src/graphql/schema.graphql",
+    query_path = "src/graphql/product_query.graphql",
+    response_derives = "Debug, Serialize, PartialEq, Eq"
+)]
+pub struct ProductQuery;
+
 impl From<Vec<ProductsQueryProductsNodes>> for Products {
     /// # Convert a vector of `ProductsQueryProductsNodes` to a `Products`
     fn from(products: Vec<ProductsQueryProductsNodes>) -> Self {
@@ -166,7 +175,6 @@ impl From<ProductsQueryProductsNodes> for Product {
                     downloadable: simple_product.downloadable,
                     download_limit: simple_product.download_limit.map(|l| l as i32),
                 };
-                tracing::info!("Simple product price: {:?}", simple_product_data.price);
             }
             ProductsQueryProductsNodesOn::ExternalProduct => {
                 tracing::info!("External product: {:?}", product_on);
@@ -246,8 +254,8 @@ impl FmtDisplay for ProductRating {
 impl EntityDisplay for Product {
     fn render(&self) -> Element {
         let Product {
-            id,
             name,
+            slug,
             description,
             image,
             simple_product,
@@ -278,7 +286,7 @@ impl EntityDisplay for Product {
                 }
                 div { class: "pl-4 text-left text-ellipsis",
                     a {
-                        href: "/products/{id}",
+                        href: "/product/{slug.clone().unwrap_or_default()}",
                         class: "w-full text-center font-bold text-xl",
                         "{name.clone().unwrap_or_default()}"
                     }
