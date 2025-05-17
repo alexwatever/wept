@@ -2,3 +2,7 @@
 **/*.rs.bk
 .DS_Store
 .env
+*.md
+
+# But not these
+!README.md

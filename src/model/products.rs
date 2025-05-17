@@ -122,46 +122,63 @@ impl From<Vec<ProductsQueryProductsNodes>> for Products {
 impl From<ProductsQueryProductsNodes> for Product {
     /// # Convert a `ProductsQueryProductsNodes` to a `Product`
     fn from(product: ProductsQueryProductsNodes) -> Self {
-        // Process image if available
-        // let image: Option<ProductImage> = product.image.map(|img| ProductImage {
-        //     id: Some(img.id),
-        //     source_url: img.source_url,
-        //     alt_text: img.alt_text,
-        //     title: img.title,
-        // });
+        // Extract data from the variant types
+        let product_on = product.on;
+        let mut simple_product_data = SimpleProduct {
+            on_sale: None,
+            stock_status: None,
+            price: None,
+            raw_price: None,
+            regular_price: None,
+            sale_price: None,
+            stock_quantity: None,
+            sold_individually: None,
+            review_count: None,
+            weight: None,
+            length: None,
+            width: None,
+            height: None,
+            purchasable: None,
+            virtual_product: None,
+            downloadable: None,
+            download_limit: None,
+        };
 
-        // // Process gallery images if available
-        // let gallery_images = product.gallery_images.and_then(|gallery| {
-        //     gallery.nodes.map(|nodes| {
-        //         nodes
-        //             .into_iter()
-        //             .map(|img| ProductImage {
-        //                 id: Some(img.id),
-        //                 source_url: img.source_url,
-        //                 alt_text: img.alt_text,
-        //                 title: None,
-        //             })
-        //             .collect()
-        //     })
-        // });
-
-        // Tests
-        let simple_product: ProductsQueryProductsNodesOn = product.on;
-        match simple_product {
-            ProductsQueryProductsNodesOn::SimpleProduct(..) => {
-                tracing::info!("Simple product: {:?}", simple_product);
+        // Extract data based on product type
+        match product_on {
+            ProductsQueryProductsNodesOn::SimpleProduct(simple_product) => {
+                simple_product_data = SimpleProduct {
+                    on_sale: simple_product.on_sale,
+                    stock_status: simple_product.stock_status.map(|s| format!("{:?}", s)),
+                    price: simple_product.price,
+                    raw_price: simple_product.raw_price,
+                    regular_price: simple_product.regular_price,
+                    sale_price: simple_product.sale_price,
+                    stock_quantity: simple_product.stock_quantity.map(|q| q as i32),
+                    sold_individually: simple_product.sold_individually,
+                    review_count: simple_product.review_count.map(|c| c as i32),
+                    weight: simple_product.weight,
+                    length: simple_product.length,
+                    width: simple_product.width,
+                    height: simple_product.height,
+                    purchasable: simple_product.purchasable,
+                    virtual_product: simple_product.virtual_,
+                    downloadable: simple_product.downloadable,
+                    download_limit: simple_product.download_limit.map(|l| l as i32),
+                };
+                tracing::info!("Simple product price: {:?}", simple_product_data.price);
             }
             ProductsQueryProductsNodesOn::ExternalProduct => {
-                tracing::info!("External product: {:?}", simple_product);
+                tracing::info!("External product: {:?}", product_on);
             }
             ProductsQueryProductsNodesOn::GroupProduct => {
-                tracing::info!("Group product: {:?}", simple_product);
+                tracing::info!("Group product: {:?}", product_on);
             }
             ProductsQueryProductsNodesOn::SimpleProductVariation => {
-                tracing::info!("Simple product variation: {:?}", simple_product);
+                tracing::info!("Simple product variation: {:?}", product_on);
             }
             ProductsQueryProductsNodesOn::VariableProduct => {
-                tracing::info!("Variable product: {:?}", simple_product);
+                tracing::info!("Variable product: {:?}", product_on);
             }
         }
 
@@ -178,50 +195,27 @@ impl From<ProductsQueryProductsNodes> for Product {
             date_on_sale_from: product.date_on_sale_from,
             date_on_sale_to: product.date_on_sale_to,
             featured_image_id: product.featured_image_id,
-
-            // Temp
-            image: None,
-            gallery_images: None,
-            simple_product: Some(SimpleProduct {
-                on_sale: None,
-                stock_status: None,
-                price: None,
-                raw_price: None,
-                regular_price: None,
-                sale_price: None,
-                stock_quantity: None,
-                sold_individually: None,
-                review_count: None,
-                weight: None,
-                length: None,
-                width: None,
-                height: None,
-                purchasable: None,
-                virtual_product: None,
-                downloadable: None,
-                download_limit: None,
+            // Process image data
+            image: product.image.map(|img| ProductImage {
+                id: Some(img.id),
+                source_url: img.source_url,
+                alt_text: img.alt_text,
+                title: img.title,
             }),
-            // image,
-            // gallery_images,
-
-            // SimpleProduct fields
-            // on_sale: product.on_sale,
-            // stock_status: product.stock_status,
-            // price: product.price,
-            // raw_price: product.raw_price,
-            // regular_price: product.as_ref().and_then(|s| s.regular_price.clone()),
-            // sale_price: simple_product.as_ref().and_then(|s| s.sale_price.clone()),
-            // stock_quantity: simple_product.as_ref().and_then(|s| s.stock_quantity),
-            // sold_individually: simple_product.as_ref().map(|s| s.sold_individually),
-            // review_count: simple_product.as_ref().and_then(|s| s.review_count),
-            // weight: simple_product.as_ref().and_then(|s| s.weight.clone()),
-            // length: simple_product.as_ref().and_then(|s| s.length.clone()),
-            // width: simple_product.as_ref().and_then(|s| s.width.clone()),
-            // height: simple_product.as_ref().and_then(|s| s.height.clone()),
-            // purchasable: simple_product.as_ref().map(|s| s.purchasable),
-            // virtual_product: simple_product.as_ref().map(|s| s.virtual_product),
-            // downloadable: simple_product.as_ref().map(|s| s.downloadable),
-            // download_limit: simple_product.as_ref().and_then(|s| s.download_limit),
+            gallery_images: product.gallery_images.map(|gallery| {
+                gallery
+                    .nodes
+                    .into_iter()
+                    .map(|img| ProductImage {
+                        id: Some(img.id),
+                        source_url: img.source_url,
+                        alt_text: img.alt_text,
+                        title: None,
+                    })
+                    .collect()
+            }),
+            // Simple product data
+            simple_product: Some(simple_product_data),
         }
     }
 }

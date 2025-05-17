@@ -4,14 +4,16 @@ Built on  [W]ordPress and L[ept]os (originally), now giving Dioxus a go.
 <br>
 
 ## Todo
-- [ ] Create schema.graphql using the wordpress example
-- [ ] Test WordPress API access
-- [ ] Add woocommerce and graphql plugin
-- [ ] Add products schema
+- [x] Create schema.graphql using the wordpress example
+- [x] Test WordPress API access
+- [x] Add woocommerce and graphql plugin
+- [ ] Create posts schema
+- [ ] Create products schema
 - [ ] Update WP settings on install:
     - [ ] GraphQL > General Settings > Enable GraphQL Debug Mode
     - [ ] GraphQL > General Settings > Enable Public Introspection
     - [ ] GraphQL > CORS Settings > Add Site Address to "Access-Control-Allow-Origin" header
+- [ ] Make SSR secure
 
 ```shell
 http POST http://localhost:8080/graphql \
