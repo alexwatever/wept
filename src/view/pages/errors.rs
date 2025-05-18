@@ -12,7 +12,7 @@ pub(crate) fn NotFoundPage(route: Vec<String>, log: Option<String>) -> Element {
                 h2 { class: "text-3xl font-bold", "Page Not Found" }
                 p { "The page you requested doesn't exist." }
 
-                if route.len() > 0 {
+                if !route.is_empty() {
                     p {
                         "Requested route:\n{route}"
                     }

@@ -1,6 +1,6 @@
 [package]
 name = "wept"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 readme = "README.md"
 description = "Wept is a web application framework built on Dioxus."
