@@ -1,34 +1,29 @@
-use dioxus::prelude::*;
+use dioxus::{prelude::*, CapturedError};
 
 // # Modules
+use super::{super::components::loader::LoaderComponent, errors::NotFoundPage};
 use crate::{controller::products::fetch_product, model::products::Product};
 
 #[component]
 #[allow(non_snake_case)]
 pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
-    let product = use_resource(move || async move { fetch_product(product_slug()).await });
+    // Fetch the product
+    let product: Resource<Result<Product, CapturedError>> =
+        use_resource(move || async move { fetch_product(product_slug()).await });
 
     let product_data = product.read();
     match product_data.as_ref() {
-        None => rsx! { // Loading state
-            div { class: "container mx-auto px-4 py-20 flex justify-center",
-                div { class: "animate-pulse",
-                    h2 { class: "text-2xl font-bold", "Loading Product..." }
-                }
-            }
+        // Loading state
+        None => rsx! {
+            LoaderComponent {}
         },
-        Some(Err(error)) => rsx! { // Error state
-            div { class: "container mx-auto px-4 py-20",
-                h2 { class: "text-3xl font-bold text-red-500", "Error Loading Product" }
-                p { class: "text-lg", "There was an error loading the product: {error}" }
-                a {
-                    class: "mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
-                    href: "/",
-                    "Return to Home"
-                }
-            }
+        // Error state
+        Some(Err(error)) => rsx! {
+            NotFoundPage { route: vec!["product".to_string(), product_slug()], log: Some(error.to_string()) }
         },
-        Some(Ok(p)) => {
+        // Product found
+        Some(Ok(product)) => {
+            // Unwrap the product
             let Product {
                 sku,
                 name,
@@ -38,19 +33,10 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                 gallery_images,
                 simple_product,
                 ..
-            } = p;
-
+            } = product;
             if simple_product.is_none() {
                 return rsx! {
-                    div { class: "container mx-auto px-4 py-20",
-                        h2 { class: "text-3xl font-bold text-red-500", "Product Not Available" }
-                        p { class: "text-lg", "This product is not available or has incomplete data." }
-                        a {
-                            class: "mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
-                            href: "/",
-                            "Return to Home"
-                        }
-                    }
+                    NotFoundPage { route: vec!["product".to_string(), product_slug()], log: None }
                 };
             }
 
@@ -92,11 +78,13 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                 _ => "Status Unknown".to_string(),
             };
 
+            // # Render page
             rsx! {
                 section { class: "py-20",
                     div { class: "container mx-auto px-4",
                         div { class: "flex flex-wrap -mx-4 mb-24",
                             div { class: "w-full md:w-1/2 px-4 mb-8 md:mb-0",
+                                // Product image
                                 div { class: "relative mb-10",
                                     style: "height: 564px;",
                                     a { class: "absolute top-1/2 left-0 ml-8 transform translate-1/2",
@@ -113,6 +101,7 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                                         icons::icon_1 {}
                                     }
                                 }
+
                                 // Gallery thumbnails if available
                                 {
                                     if let Some(gallery) = gallery_images.as_ref() {
@@ -137,13 +126,16 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                             div { class: "w-full md:w-1/2 px-4",
                                 div { class: "lg:pl-20",
                                     div { class: "mb-10 pb-10 border-b",
+                                        // Product name
                                         h2 { class: "mt-2 mb-6 max-w-xl text-5xl md:text-6xl font-bold font-heading",
                                             "{name.clone().unwrap_or_default()}"
                                         }
+
                                         // Price
                                         p { class: "inline-block mb-4 text-2xl font-bold font-heading text-blue-500",
                                             "{price_display}"
                                         }
+
                                         // Stock status
                                         p { class: "mb-8 text-sm",
                                             span {
@@ -151,6 +143,7 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                                                 "{stock_info}"
                                             }
                                         }
+
                                         // Short description
                                         {
                                             if let Some(short_desc) = short_description.as_ref() {
@@ -163,6 +156,7 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                                                 rsx! { "" }
                                             }
                                         }
+
                                         // Product SKU
                                         {
                                             if let Some(sku_val) = sku.as_ref() {
@@ -176,6 +170,8 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                                             }
                                         }
                                     }
+
+                                    // Add to cart button
                                     div { class: "flex flex-wrap -mx-4 mb-14 items-center",
                                         div { class: "w-full xl:w-2/3 px-4 mb-4 xl:mb-0",
                                             a { class: "block bg-orange-300 hover:bg-orange-400 text-center text-white font-bold font-heading py-5 px-8 rounded-md uppercase transition duration-200",
@@ -184,6 +180,8 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                                             }
                                         }
                                     }
+
+                                    // Share buttons
                                     div { class: "flex items-center",
                                         span { class: "mr-8 text-gray-500 font-bold font-heading uppercase",
                                             "SHARE IT"
@@ -214,6 +212,7 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                             }
                         }
                         div {
+                            // Product tabs
                             ul { class: "flex flex-wrap mb-16 border-b-2",
                                 li { class: "w-1/2 md:w-auto",
                                     a { class: "inline-block py-6 px-10 bg-white text-gray-500 font-bold font-heading shadow-2xl",
@@ -240,13 +239,17 @@ pub(crate) fn ProductPage(product_slug: ReadOnlySignal<String>) -> Element {
                                     }
                                 }
                             }
+
+                            // Product details
                             h3 { class: "mb-8 text-3xl font-bold font-heading text-blue-300",
                                 "{name.clone().unwrap_or_default()} Details"
                             }
+
                             // Full description
                             div { class: "max-w-2xl text-gray-500 mb-10",
                                 dangerous_inner_html: "{description.clone().unwrap_or_default()}"
                             }
+
                             // Additional details
                             {
                                 if weight.is_some() {

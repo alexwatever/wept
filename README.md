@@ -4,24 +4,26 @@ Built on  [W]ordPress and L[ept]os (originally), now giving Dioxus a go.
 <br>
 
 ## Todo
-- [x] Create schema.graphql using the wordpress example
-- [x] Test WordPress API access
-- [x] Add woocommerce and graphql plugin
-- [ ] Create posts schema
-- [ ] Create products schema
-- [ ] Update WP settings on install:
+- [x] Setup GraphQL schema extracted from WordPress
+- [x] Setup WordPress API access
+- [x] Setup WooCommerce and GraphQL plugins
+- [ ] Front-end features
+    - [x] Create Home page routing and components
+    - [x] Create Error page routing and components
+    - [x] Create Post page routing and components
+    - [x] Create Product page routing and components
+    - [ ] Create Category page routing and components
+    - [ ] Create Contact page routing and components
+    - [ ] Create Search queries, routing, and components
+    - [ ] Create Navigation components (header, footer, menu, etc.)
+    - [ ] Create Pagination implementation
+- [ ] Update WordPress settings on install:
     - [ ] GraphQL > General Settings > Enable GraphQL Debug Mode
     - [ ] GraphQL > General Settings > Enable Public Introspection
     - [ ] GraphQL > CORS Settings > Add Site Address to "Access-Control-Allow-Origin" header
-- [ ] Make SSR secure
-
-```shell
-http POST http://localhost:8080/graphql \
-    Content-Type:application/json \
-    <<< '{
-        "query": "{ generalSettings { url } }"
-    }'
-```
+- [ ] Review critical SEO features
+- [ ] Secure SSR
+- [ ] CICD pipeline
 <br>
 
 ## Usage
@@ -51,6 +53,16 @@ dx build --release
 <br>
 
 ## GraphQL
+
+### Test WordPress API
+
+```shell
+http POST http://localhost:8080/graphql \
+    Content-Type:application/json \
+    <<< '{
+        "query": "{ generalSettings { url } }"
+    }'
+```
 
 ### Extract GraphQL Schema
 

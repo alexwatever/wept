@@ -1,10 +1,7 @@
-use dioxus::prelude::*;
 use graphql_client::GraphQLQuery;
 use parse_display::FromStr;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display as FmtDisplay, Formatter, Result as FmtResult};
-
-use crate::view::components::entity_list::EntityDisplay;
 
 /// # Post
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
@@ -71,36 +68,4 @@ pub(crate) enum PostSize {
     #[default]
     Medium,
     Large,
-}
-
-impl EntityDisplay for Post {
-    fn render(&self) -> Element {
-        let Post {
-            id,
-            content,
-            slug,
-            title,
-            ..
-        } = self.clone();
-
-        rsx! {
-            section { class: "p-2 m-2 shadow-lg ring-1 rounded-lg flex flex-row place-items-center hover:ring-4 hover:shadow-2xl transition-all duration-200",
-                div { class: "pl-4 text-left text-ellipsis",
-                    a {
-                        href: "/post/{slug.as_ref().unwrap_or(&id)}",
-                        class: "w-full text-center font-bold text-xl",
-                        "{title:?}"
-                    }
-                    p {
-                        class: "w-full text-sm text-gray-500",
-                        "{slug:?}"
-                    }
-                    p {
-                        class: "w-full text-sm overflow-hidden line-clamp-3",
-                        "{content:?}"
-                    }
-                }
-            }
-        }
-    }
 }

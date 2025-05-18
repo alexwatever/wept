@@ -1,11 +1,8 @@
-use dioxus::prelude::*;
 use graphql_client::GraphQLQuery;
 use parse_display::Display;
 use products_query::{ProductsQueryProductsNodes, ProductsQueryProductsNodesOn};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display as FmtDisplay, Formatter, Result as FmtResult};
-
-use crate::view::components::entity_list::EntityDisplay;
 
 /// # Product Image
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
@@ -248,66 +245,5 @@ impl FmtDisplay for ProductRating {
         write!(f, " ({:01}) ({} ratings)", self.rate, self.count)?;
 
         Ok(())
-    }
-}
-
-impl EntityDisplay for Product {
-    fn render(&self) -> Element {
-        let Product {
-            name,
-            slug,
-            description,
-            image,
-            simple_product,
-            ..
-        } = self.clone();
-
-        let price = simple_product.as_ref().and_then(|s| s.price.clone());
-
-        rsx! {
-            section { class: "h-40 p-2 m-2 shadow-lg ring-1 rounded-lg flex flex-row place-items-center hover:ring-4 hover:shadow-2xl transition-all duration-200",
-                // Display product image if available
-                {
-                    if let Some(img) = image {
-                        rsx! {
-                            img {
-                                class: "object-scale-down w-1/6 h-full",
-                                src: "{img.source_url.clone().unwrap_or_default()}",
-                                alt: "{img.alt_text.clone().unwrap_or_default()}"
-                            }
-                        }
-                    } else {
-                        rsx! {
-                            div { class: "w-1/6 h-full bg-gray-200 flex items-center justify-center",
-                                "No Image"
-                            }
-                        }
-                    }
-                }
-                div { class: "pl-4 text-left text-ellipsis",
-                    a {
-                        href: "/product/{slug.clone().unwrap_or_default()}",
-                        class: "w-full text-center font-bold text-xl",
-                        "{name.clone().unwrap_or_default()}"
-                    }
-                    {
-                        if let Some(price_str) = price {
-                            rsx! {
-                                p {
-                                    class: "w-full text-sm font-bold text-green-600",
-                                    "{price_str}"
-                                }
-                            }
-                        } else {
-                            rsx! { "" }
-                        }
-                    }
-                    p {
-                        class: "w-full text-sm overflow-hidden line-clamp-3",
-                        "{description.clone().unwrap_or_default()}"
-                    }
-                }
-            }
-        }
     }
 }

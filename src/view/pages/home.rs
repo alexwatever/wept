@@ -2,12 +2,12 @@ use dioxus::prelude::*;
 use tracing::{error, info};
 
 // # Modules
+use super::super::components::{posts::PostsComponent, products::ProductsComponent};
 use crate::{
     controller::Controller,
     model::{
         pagination::PageSort, posts::Posts as PostsModel, products::Products as ProductsModel,
     },
-    view::components::{posts::PostsComponent, products::ProductsComponent},
 };
 
 #[allow(non_snake_case)]
@@ -17,13 +17,10 @@ pub(crate) fn HomePage() -> Element {
 
     use_effect(move || {
         info!("Home page mounted (from use_effect, runs once)");
-        // Return a cleanup function if needed
-        // || info!("Home page unmounted")
     });
 
     // Get products asyncronously
     let _get_products: Resource<()> = use_resource(move || async move {
-        // Fetch products
         let update: ProductsModel = ProductsModel::get_page(Some(10), Some(PageSort::Ascending))
             .await
             .unwrap_or_else(|err| {
@@ -37,7 +34,6 @@ pub(crate) fn HomePage() -> Element {
 
     // Get posts asyncronously
     let _get_posts: Resource<()> = use_resource(move || async move {
-        // Fetch posts
         let update: PostsModel = PostsModel::get_page(Some(10), Some(PageSort::Ascending))
             .await
             .unwrap_or_else(|err| {

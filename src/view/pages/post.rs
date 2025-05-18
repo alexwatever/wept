@@ -1,34 +1,29 @@
-use dioxus::prelude::*;
+use dioxus::{prelude::*, CapturedError};
 
 // # Modules
+use super::{super::components::loader::LoaderComponent, errors::NotFoundPage};
 use crate::{controller::posts::fetch_post, model::posts::Post};
 
 #[component]
 #[allow(non_snake_case)]
 pub(crate) fn PostPage(post_slug: ReadOnlySignal<String>) -> Element {
-    let post = use_resource(move || async move { fetch_post(post_slug()).await });
+    // Fetch the post
+    let post: Resource<Result<Post, CapturedError>> =
+        use_resource(move || async move { fetch_post(post_slug()).await });
 
     let post_data = post.read();
     match post_data.as_ref() {
-        None => rsx! { // Loading state
-            div { class: "container mx-auto px-4 py-20 flex justify-center",
-                div { class: "animate-pulse",
-                    h2 { class: "text-2xl font-bold", "Loading Post..." }
-                }
-            }
+        // Loading state
+        None => rsx! {
+            LoaderComponent {}
         },
-        Some(Err(error)) => rsx! { // Error state
-            div { class: "container mx-auto px-4 py-20",
-                h2 { class: "text-3xl font-bold text-red-500", "Error Loading Post" }
-                p { class: "text-lg", "There was an error loading the post: {error}" }
-                a {
-                    class: "mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
-                    href: "/",
-                    "Return to Home"
-                }
-            }
+        // Error state
+        Some(Err(error)) => rsx! {
+            NotFoundPage { route: vec!["post".to_string(), post_slug()], log: Some(error.to_string()) }
         },
-        Some(Ok(p)) => {
+        // Post found
+        Some(Ok(post)) => {
+            // Unwrap the post
             let Post {
                 id,
                 content,
@@ -36,8 +31,9 @@ pub(crate) fn PostPage(post_slug: ReadOnlySignal<String>) -> Element {
                 title,
                 date,
                 ..
-            } = p;
+            } = post;
 
+            // # Render page
             rsx! {
                 section { class: "py-20",
                     div { class: "container mx-auto px-4",
@@ -49,6 +45,7 @@ pub(crate) fn PostPage(post_slug: ReadOnlySignal<String>) -> Element {
                                         h2 { class: "mt-2 mb-6 max-w-xl text-5xl md:text-6xl font-bold font-heading",
                                             "{title.clone().unwrap_or_default()}"
                                         }
+
                                         // Post metadata
                                         {
                                             if let Some(post_date) = date.as_ref() {
@@ -61,7 +58,7 @@ pub(crate) fn PostPage(post_slug: ReadOnlySignal<String>) -> Element {
                                                 rsx! { "" }
                                             }
                                         }
-                                        // We've removed the author and categories sections to match the simplified model
+
                                         // Post slug
                                         p { class: "inline-block mb-8 text-gray-600",
                                             span {
@@ -71,6 +68,7 @@ pub(crate) fn PostPage(post_slug: ReadOnlySignal<String>) -> Element {
                                                 "(ID: {id})"
                                             }
                                         }
+
                                         // Post content
                                         div { class: "max-w-md",
                                             dangerous_inner_html: "{content.clone().unwrap_or_default()}"

@@ -19,5 +19,5 @@ pub(crate) enum Routes {
     PostPage { post_slug: String },
     
     #[route("/:..route")]
-    NotFoundPage { route: Vec<String> },
+    NotFoundPage { route: Vec<String>, log: Option<String> },
 }
