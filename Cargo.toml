@@ -1,21 +1,26 @@
 [package]
 name = "wept"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 readme = "README.md"
-description = "Wept is a web application framework built on Dioxus."
+description = "Wept is a web application framework built on Dioxus and WordPress."
 repository = "https://github.com/alexwatever/wept"
 authors = ["Alex Watson <alex@coded.cc>"]
 license = "MPL-2.0"
 
 [dependencies]
-dioxus = { version = "0.6.3", features = ["fullstack", "router"] }
+async-trait = "0.1.88"
+chrono = { version = "0.4", features = ["serde"] }
 envy = "0.4.2"
+dioxus = { version = "0.6.3", features = ["web", "router"] }
 graphql_client = { version = "0.14.0" }
 parse-display = { version = "0.10.0" }
-reqwest = { version = "0.12.5", features = ["json"] }
-serde = { version = "1.0.136", features = ["derive"] }
-tracing = { version = "0.1.41" }
+reqwest = { version = "0.12.15", features = ["json"] }
+serde = { version = "1.0.219", features = ["derive"] }
+tracing = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = ["fmt"] }
+tracing-wasm = "0.2.1"
+uuid = { version = "1.16", features = ["v4", "serde", "js"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 # chrono = { version = "0.4.34", features = ["serde", "wasmbind"] }
@@ -25,7 +30,6 @@ tracing = { version = "0.1.41" }
 
 [features]
 web = ["dioxus/web"]
-server = ["dioxus/server"]
 
 [lints.rust]
 unsafe_code = "forbid"

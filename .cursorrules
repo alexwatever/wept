@@ -1,0 +1,214 @@
+# Cursor AI Assistant Guidelines for Wept Project
+
+This document outlines the critical rules, coding standards, architectural patterns, and best practices to follow when assisting with the Wept project. Adherence to these guidelines is paramount.
+
+**Overall AI Behavior:**
+- Proactively apply these rules when generating or modifying code.
+- When in doubt, refer to these guidelines or ask for clarification if a situation is not covered.
+- Prioritize rules marked as `[CRITICAL]` and `[IMPORTANT]`.
+
+# Wept: Rust/Dioxus E-Commerce with WordPress
+
+## Project Overview
+Wept is a Rust-based e-commerce application that:
+- Uses Dioxus for UI components (React-like Rust framework)
+- Interfaces with WordPress/WooCommerce via GraphQL
+- Follows controllers/services/models architecture pattern
+- Is actively developed according to the README roadmap
+
+## Version Information
+- Rust: 1.70+ (2021 edition)
+- Dioxus: 0.4+
+- GraphQL Client: graphql_client 0.12+
+- Tailwind CSS: 3.0+
+
+## Architecture
+```
+src/
+├── app/             # Global state, config, error handling
+├── controllers/     # Data flow between UI and API
+├── graphql/         # WordPress GraphQL client and queries
+├── models/          # Data structures and DTOs
+├── routes/          # Application routing
+├── services/        # API and business logic
+└── views/           # UI components and pages
+```
+
+## Code Patterns
+
+### Key Patterns to Follow **[CRITICAL]**
+- **State Management**: Use `STATE` global signal for app-wide state, component signals for local state
+  ```rust
+  // CORRECT: Accessing global state
+  let backend_host = State::get_backend_host();
+  
+  // CORRECT: Using component-local state
+  let count = use_signal(|| 0);
+  ```
+
+- **Component Structure**: Use `#[component]` attribute, PascalCase names, and Element return types
+  ```rust
+  // CORRECT: Component definition
+  #[component]
+  pub fn ProductCard(product: Product) -> Element {
+      rsx! {
+          div { class: "product-card",
+              h3 { "{product.name}" }
+          }
+      }
+  }
+  ```
+
+- **Ownership**: Clone values before moving into closures/async contexts
+  ```rust
+  // CORRECT: Cloning before moving into closure
+  let controller = controller.clone();
+  
+  // This would cause compiler error: 
+  // onclick: move |_| controller.get_product(id)
+  
+  // CORRECT: Clone before use
+  onclick: move |_| {
+      let controller = controller.clone();
+      controller.get_product(id)
+  }
+  ```
+
+- **GraphQL**: Use the client pattern in `graphql/` module with proper variables and response handling
+  ```rust
+  // CORRECT: GraphQL request with proper error handling
+  match client.execute_query(&variables).await {
+      Ok(data) => { /* handle success */ },
+      Err(e) => { /* handle error */ }
+  }
+  ```
+
+- **Styling**: Use Tailwind CSS classes, maintain consistent styling patterns
+  ```rust
+  // CORRECT: Tailwind styling
+  div { class: "p-4 bg-white shadow rounded-lg", 
+      // component content 
+  }
+  ```
+
+### Anti-Patterns to Avoid **[CRITICAL]**
+- Never use warning suppression attributes
+  ```rust
+  // WRONG: Don't do this
+  #[allow(dead_code)]
+  #[allow(unused)]
+  
+  // CORRECT: Document why the code exists
+  /// Will be used for product filtering in category pages
+  /// as per roadmap item #3
+  pub fn filter_products() { /* ... */ }
+  ```
+
+- Don't suppress non-snake_case warnings for component functions (PascalCase is correct)
+- Don't write code without proper doc comments
+- Don't document obvious functionality; explain WHY code exists
+- Don't make changes without running both `cargo check` AND `cargo clippy`
+- Don't implement complex features without proper testing
+
+## Coding Standards
+
+1. **Code Quality** **[CRITICAL]**
+   - Run `cargo check` and `cargo clippy` before and after making changes
+   - Document unused code with clear purpose explanations
+   - Always verify that changes preserve functionality
+   - Use `dx check` to validate Dioxus-specific code
+
+2. **Documentation** **[IMPORTANT]**
+   - Use doc comments (`///`) for all public API components
+   - Reference the roadmap when documenting future-use code
+   - Explain WHY code exists, especially if not currently used
+   ```rust
+   /// Product controller handles product data operations
+   /// 
+   /// This controller is responsible for:
+   /// - Fetching product details
+   /// - Listing products with pagination
+   /// - Will add filtering capability for category pages (roadmap item #3)
+   pub struct ProductController { /* ... */ }
+   ```
+
+3. **Naming** **[IMPORTANT]**
+   - Components: PascalCase (`ProductPage`)
+   - Functions: snake_case (`get_products`)
+   - Files: snake_case.rs (`product_controller.rs`)
+   - Routes: PascalCase with Page suffix (`HomePage`)
+
+4. **Testing** **[IMPORTANT]**
+   - Test UI components visually in the browser
+   - Verify all routes are working correctly
+   - Check error states and edge cases
+   - Test with mock data before connecting to real backend
+
+## File Organization
+
+- **New Controllers**: Add to `src/controllers/` with corresponding tests
+- **New Components**: Add to `src/views/components/` with appropriate subdirectory
+- **New Pages**: Add to `src/views/pages/` with corresponding route
+- **GraphQL Queries**: Add to `src/graphql/queries/` with descriptive names
+- **Models**: Add to `src/models/` with appropriate subdirectory for DTOs
+
+## Common Tasks
+
+1. **Adding new routes** **[RECOMMENDED]**
+   - Add variant to `Routes` enum in `src/routes/handlers.rs`
+   - Create page component in `src/views/pages/`
+   - Follow naming pattern: `FooPage`, `BarPage`
+
+2. **Managing State** **[RECOMMENDED]**
+   - Global state: Import from `src/app/state.rs`
+   - Local state: Use Dioxus signals
+   - Access values with `.read()` on signals
+
+3. **API Communication** **[RECOMMENDED]**
+   - Use controllers for domain-specific operations
+   - Handle responses with proper error checking
+   - Clone controllers before use in async contexts
+
+4. **Dioxus Development** **[RECOMMENDED]**
+   - Start the development server: `dx serve --hot-reload true`
+   - Run Tailwind CSS watcher: `npx tailwindcss -i ./input.css -o ./public/tailwind.css --watch`
+   - Build for production: `dx build --release`
+   - Debug with browser console and network tab
+
+## Common Errors and Solutions
+
+- **Use of moved value**: Clone values before moving into closures
+  ```rust
+  // Error: Use of moved value: `controller`
+  // Solution: Clone before use
+  let controller = controller.clone();
+  ```
+
+- **Cannot infer type**: Add explicit type annotations
+  ```rust
+  // Error: Cannot infer type
+  // Solution: Add type annotation
+  let products: Vec<Product> = vec![];
+  ```
+
+- **Missing component props**: Check component parameter naming
+  ```rust
+  // Error: Missing required prop `product`
+  // Solution: Ensure prop name matches component definition
+  ProductCard { product: product.clone() }
+  ```
+
+## Dependencies **[IMPORTANT]**
+
+- Core dependencies are defined in `Cargo.toml`
+- Never add dependencies without consulting the team
+- Prefer using existing utilities over adding new dependencies
+- Consider performance implications for web/WASM target
+
+## Key Files
+- `src/main.rs`: Application entry point
+- `src/routes/handlers.rs`: Application routes
+- `src/app/state.rs`: Global state
+- `src/controllers/`: API controllers
+- `src/views/`: UI components
+- `src/graphql/`: GraphQL client/queries 

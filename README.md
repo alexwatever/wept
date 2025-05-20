@@ -7,6 +7,7 @@ Built on  [W]ordPress and L[ept]os (originally), now giving Dioxus a go.
 - [x] Setup GraphQL schema extracted from WordPress
 - [x] Setup WordPress API access
 - [x] Setup WooCommerce and GraphQL plugins
+- [ ] Improved and consolidated error handling
 - [ ] Front-end features
     - [x] Create Home page routing and components
     - [x] Create Error page routing and components

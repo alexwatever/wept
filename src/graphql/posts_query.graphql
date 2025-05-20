@@ -1,14 +1,18 @@
-
 # Posts
 # `$first` - The number of items to return after the referenced "after" cursor (ie. page size)
 # `$after` - Cursor used along with the "first" argument to reference where in the dataset to get data
-query PostsQuery($first: Int!, $after: String) {
+query PostsQuery($first: Int, $after: String) {
   posts(first: $first, after: $after) {
     nodes {
       id
+      title
       content
       slug
-      title
+      date
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
     }
   }
 }

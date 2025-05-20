@@ -12,7 +12,6 @@ query ProductQuery($slug: ID!) {
     shortDescription
     dateOnSaleFrom
     dateOnSaleTo
-    featuredImageId
     image {
       __typename
       id
@@ -20,13 +19,13 @@ query ProductQuery($slug: ID!) {
       altText
       title
     }
-    galleryImages {
-      __typename
+    galleryImages(first: 5) {
       nodes {
         __typename
         id
         sourceUrl
         altText
+        title
       }
     }
     ... on SimpleProduct {
@@ -38,16 +37,6 @@ query ProductQuery($slug: ID!) {
       regularPrice
       salePrice
       stockQuantity
-      soldIndividually
-      reviewCount
-      weight
-      length
-      width
-      height
-      purchasable
-      virtual
-      downloadable
-      downloadLimit
     }
     ... on VariableProduct {
       __typename

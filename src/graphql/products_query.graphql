@@ -1,9 +1,8 @@
 # Products
 # `$first` - The number of items to return after the referenced "after" cursor (ie. page size)
 # `$after` - Cursor used along with the "first" argument to reference where in the dataset to get data
-query ProductsQuery($first: Int!, $after: String) {
+query ProductsQuery($first: Int, $after: String) {
   products(first: $first, after: $after) {
-    __typename
     nodes {
       __typename
       id
@@ -15,21 +14,24 @@ query ProductsQuery($first: Int!, $after: String) {
       shortDescription
       dateOnSaleFrom
       dateOnSaleTo
-      featuredImageId
       image {
+        __typename
         id
         sourceUrl
         altText
         title
       }
-      galleryImages {
+      galleryImages(first: 1) {
         nodes {
+          __typename
           id
           sourceUrl
           altText
+          title
         }
       }
       ... on SimpleProduct {
+        __typename
         onSale
         stockStatus
         price
@@ -37,17 +39,12 @@ query ProductsQuery($first: Int!, $after: String) {
         regularPrice
         salePrice
         stockQuantity
-        soldIndividually
-        reviewCount
-        weight
-        length
-        width
-        height
-        purchasable
-        virtual
-        downloadable
-        downloadLimit
       }
+    }
+    pageInfo {
+      __typename
+      endCursor
+      hasNextPage
     }
   }
 }

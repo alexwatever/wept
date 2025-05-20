@@ -1,12 +1,11 @@
 # Post by slug
-# `$post_id` - The post ID
-query PostQuery($post_slug: ID!) {
-  post(id: $post_slug, idType: SLUG) {
-    __typename
+# `$slug` - The post slug
+query PostQuery($slug: ID!) {
+  post(id: $slug, idType: SLUG) {
     id
+    title
     content
     slug
-    title
     date
   }
 }
