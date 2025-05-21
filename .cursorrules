@@ -198,6 +198,9 @@ src/
   ProductCard { product: product.clone() }
   ```
 
+- **Incorrect let bindings in rsx! macro**:
+  When constructing UI with the Dioxus `rsx!` macro, avoid placing standalone `let` bindings for intermediate variables directly within the `rsx! { ... }` block. Compute necessary values before the `rsx!` call, or use `if let` / `for` patterns to destructure or iterate. For conditional rendering of complex blocks, consider creating a separate sub-component or moving the conditional logic outside `rsx!` to determine visibility, then conditionally include the pre-rendered or simpler `rsx!` block.
+
 ## Dependencies **[IMPORTANT]**
 
 - Core dependencies are defined in `Cargo.toml`

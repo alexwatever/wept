@@ -6,7 +6,7 @@ use crate::{
     controllers::common::EntityController,
     graphql::{
         client::GraphQLClient,
-        queries::post::{post_query, posts_query, PostQuery, PostsQuery},
+        models::post::{post_query, posts_query, PostQuery, PostsQuery},
     },
     models::post::{Post, Posts},
 };
@@ -19,7 +19,7 @@ pub struct PostController {
 }
 
 impl PostController {
-    /// Create a new post controller
+    /// Creates a new post controller
     pub fn new() -> Self {
         Self {
             client: GraphQLClient::new(),
@@ -125,7 +125,7 @@ impl EntityController for PostController {
             AppError::new(
                 AppErrorKind::NotFound,
                 "The requested posts could not be found.".to_string(),
-                Some(format!("Posts not found in GraphQL response.")),
+                Some("Posts not found in GraphQL response.".to_string()),
                 None,
             )
         })

@@ -1,10 +1,12 @@
-use crate::app::state::State;
 use graphql_client::{GraphQLQuery, QueryBody, Response};
 use reqwest::Client;
 use serde::{de::DeserializeOwned, Serialize};
 
+// Modules
+use crate::app::state::State;
+
 /// GraphQL client for making requests to the WordPress API
-#[derive(Default, Debug)]
+#[derive(Default, Clone, Debug)]
 pub struct GraphQLClient {
     /// HTTP client for making network requests
     pub client: Client,

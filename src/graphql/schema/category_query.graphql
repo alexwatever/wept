@@ -1,0 +1,43 @@
+query ProductCategory($slug: ID!, $firstProducts: Int, $afterProducts: String) {
+  productCategory(id: $slug, idType: SLUG) {
+    id
+    databaseId
+    name
+    slug
+    description
+    count
+    image {
+      id
+      sourceUrl
+      altText
+    }
+    products(first: $firstProducts, after: $afterProducts) {
+      edges {
+        node {
+          __typename
+          id
+          databaseId
+          slug
+          name
+          image {
+            id
+            sourceUrl
+            altText
+          }
+          ... on SimpleProduct {
+            price
+            rawPrice: price(format: RAW)
+            regularPrice
+            salePrice
+            stockStatus
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+} 

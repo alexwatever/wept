@@ -6,15 +6,15 @@ use crate::{models::post::Post, routes::Routes};
 
 /// Post card component
 ///
-/// Displays a post within a list.
+/// Displays a post within a list
 ///
 /// **Arguments**
 ///
-/// * `post` - The post to display.
+/// * `post` - The post to display
 ///
 /// **Returns**  
 ///
-/// A component that displays the post.
+/// A component that displays the post
 #[component]
 pub fn PostCard(post: Post) -> Element {
     // Create content preview

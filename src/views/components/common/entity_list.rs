@@ -2,8 +2,11 @@ use dioxus::prelude::*;
 
 // Modules
 use crate::{
-    models::{post::Post, product::Product},
-    views::components::{post::post_card::PostCard, product::product_card::ProductCard},
+    models::{category::ProductCategory, post::Post, product::Product},
+    views::components::{
+        category::category_card::ProductCategoryCard, post::post_card::PostCard,
+        product::product_card::ProductCard,
+    },
 };
 
 /// Entity List component
@@ -74,6 +77,23 @@ impl EntityDisplay for Product {
     fn render(&self) -> Element {
         rsx! {
             ProductCard { product: self.clone() }
+        }
+    }
+}
+
+/// Implementation of EntityDisplay for ProductCategory
+///
+/// **Arguments**
+///
+/// * `self` - The ProductCategory to render
+///
+/// **Returns**
+///
+/// * `Element` - A ProductCategory component in list format
+impl EntityDisplay for ProductCategory {
+    fn render(&self) -> Element {
+        rsx! {
+            ProductCategoryCard { category: self.clone() }
         }
     }
 }

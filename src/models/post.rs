@@ -1,9 +1,12 @@
 use serde::{Deserialize, Serialize};
 
 // Modules
-use crate::graphql::queries::post::{
-    post_query::PostQueryPost,
-    posts_query::{PostsQueryPosts, PostsQueryPostsNodes},
+use crate::{
+    graphql::models::post::{
+        post_query::PostQueryPost,
+        posts_query::{PostsQueryPosts, PostsQueryPostsNodes, PostsQueryPostsPageInfo},
+    },
+    models::pagination::Pagination,
 };
 
 /// Post entity representing a WordPress post
@@ -63,9 +66,12 @@ impl From<PostsQueryPostsNodes> for Post {
     }
 }
 
-/// Collection of posts
-#[derive(Debug, PartialEq)]
-pub struct Posts(pub Vec<Post>);
+/// Collection of posts with pagination information
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone, Default)]
+pub struct Posts {
+    pub posts: Vec<Post>,
+    pub page_info: Option<Pagination>,
+}
 
 impl From<PostsQueryPosts> for Posts {
     /// Convert a PostsQueryPosts to Posts
@@ -78,6 +84,27 @@ impl From<PostsQueryPosts> for Posts {
     ///
     /// * `Posts` - The converted Posts
     fn from(posts: PostsQueryPosts) -> Self {
-        Posts(posts.nodes.into_iter().map(Post::from).collect())
+        let page_info: Option<Pagination> = Some(Pagination::from(posts.page_info));
+        let posts: Vec<Post> = posts.nodes.into_iter().map(Post::from).collect();
+
+        Self { posts, page_info }
+    }
+}
+
+impl From<PostsQueryPostsPageInfo> for Pagination {
+    /// Convert a PostsQueryPostsPageInfo to a Pagination
+    ///
+    /// **Arguments**
+    ///
+    /// * `page_info` - The GraphQL page info to convert
+    ///
+    /// **Returns**
+    ///
+    /// * `Pagination` - The converted Pagination
+    fn from(page_info: PostsQueryPostsPageInfo) -> Self {
+        Self {
+            end_cursor: page_info.end_cursor,
+            has_next_page: page_info.has_next_page,
+        }
     }
 }

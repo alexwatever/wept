@@ -54,7 +54,7 @@ pub fn Nav() -> Element {
                 // Burger menu
                 a { class: "navbar-burger self-center mr-12 xl:hidden",
                     href: "#",
-                    icons::hamburger {}
+                    icons::hamburger_menu {}
                 }
             }
         }

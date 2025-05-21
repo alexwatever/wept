@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 // Modules
 use crate::{
     app::error::AppError,
-    controllers::{common::EntityController, product_controller::ProductController},
+    controllers::{common::EntityController, product::ProductController},
     models::product::{Product, ProductImage, SimpleProduct},
     views::components::common::loader::LoaderComponent,
     views::pages::errors::NotFoundPage,
@@ -62,10 +62,7 @@ pub fn ProductPage(product_slug: String) -> Element {
             };
 
             // Product name
-            let name: String = name
-                .as_ref()
-                .map(|name: &String| name.clone())
-                .unwrap_or_default();
+            let name: String = name.clone().unwrap_or_default();
 
             // Product image
             let image: Option<String> = image
@@ -73,17 +70,16 @@ pub fn ProductPage(product_slug: String) -> Element {
                 .and_then(|img: &ProductImage| img.source_url.clone());
 
             // Produce price
-            let price: String = if on_sale.unwrap_or(false) {
-                format!(
-                    "{} (Sale: {})",
-                    regular_price.as_ref().unwrap_or(&String::new()),
-                    sale_price.as_ref().unwrap_or(&String::new())
-                )
+            let price: Option<String> = if on_sale.unwrap_or(false) {
+                if let (Some(regular_price), Some(sale_price)) =
+                    (regular_price.as_ref(), sale_price.as_ref())
+                {
+                    Some(format!("{} (Sale: {})", regular_price, sale_price))
+                } else {
+                    None
+                }
             } else {
-                price
-                    .as_ref()
-                    .map(|price: &String| price.clone())
-                    .unwrap_or(String::new())
+                price.clone()
             };
 
             // Product stock status
@@ -140,8 +136,10 @@ pub fn ProductPage(product_slug: String) -> Element {
                                         }
 
                                         // Price
-                                        p { class: "inline-block mb-4 text-2xl font-bold font-heading text-blue-500",
-                                            "{price}"
+                                        if let Some(price) = price {
+                                            p { class: "inline-block mb-4 text-2xl font-bold font-heading text-blue-500",
+                                                "{price}"
+                                            }
                                         }
 
                                         // Stock status

@@ -3,25 +3,33 @@
 Built on  [W]ordPress and L[ept]os (originally), now giving Dioxus a go.
 <br>
 
-## Todo
+## Features
+
+This list is a work in progress. Features are implemented based on what I feel like doing at the time.  
+
 - [x] Setup GraphQL schema extracted from WordPress
 - [x] Setup WordPress API access
 - [x] Setup WooCommerce and GraphQL plugins
-- [ ] Improved and consolidated error handling
-- [ ] Front-end features
+- [ ] Front-end:
     - [x] Create Home page routing and components
     - [x] Create Error page routing and components
     - [x] Create Post page routing and components
     - [x] Create Product page routing and components
-    - [ ] Create Category page routing and components
+    - [x] Create Category page routing and components
+        - [ ] Implement Pagination for category products
     - [ ] Create Contact page routing and components
-    - [ ] Create Search queries, routing, and components
     - [ ] Create Navigation components (header, footer, menu, etc.)
-    - [ ] Create Pagination implementation
+    - [ ] Create Search queries, routing, and components
+        - [ ] Implement Pagination for search results
+- [ ] Integrations:
+    - [ ] reCAPTCHA Enterprise
+    - [ ] Google Analytics 4
+    - [ ] Schema.org
 - [ ] Update WordPress settings on install:
     - [ ] GraphQL > General Settings > Enable GraphQL Debug Mode
     - [ ] GraphQL > General Settings > Enable Public Introspection
     - [ ] GraphQL > CORS Settings > Add Site Address to "Access-Control-Allow-Origin" header
+- [ ] Improved and consolidated error handling (WIP)
 - [ ] Review critical SEO features
 - [ ] Secure SSR
 - [ ] CICD pipeline

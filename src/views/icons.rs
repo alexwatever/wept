@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 /// Hamburger menu icon
-pub fn hamburger() -> Element {
+pub fn hamburger_menu() -> Element {
     rsx! {
         svg {
             height: "19",

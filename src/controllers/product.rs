@@ -6,7 +6,7 @@ use crate::{
     controllers::common::EntityController,
     graphql::{
         client::GraphQLClient,
-        queries::product::{product_query, products_query, ProductQuery, ProductsQuery},
+        models::product::{product_query, products_query, ProductQuery, ProductsQuery},
     },
     models::product::{Product, Products},
 };
@@ -19,7 +19,7 @@ pub struct ProductController {
 }
 
 impl ProductController {
-    /// Create a new product controller
+    /// Creates a new product controller
     pub fn new() -> Self {
         Self {
             client: GraphQLClient::new(),
@@ -123,7 +123,7 @@ impl EntityController for ProductController {
             AppError::new(
                 AppErrorKind::NotFound,
                 "The requested products could not be found.".to_string(),
-                Some(format!("Products not found in GraphQL response.")),
+                Some("Products not found in GraphQL response.".to_string()),
                 None,
             )
         })

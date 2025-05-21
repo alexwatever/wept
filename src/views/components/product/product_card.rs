@@ -2,25 +2,29 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::Link;
 
 // Modules
-use crate::{models::product::Product, routes::Routes};
+use crate::{
+    models::product::{Product, ProductImage},
+    routes::Routes,
+};
 
 /// Product card component
 ///
-/// Displays a product within a list.
+/// Displays a product within a list
 ///
 /// **Arguments**  
 ///
-/// * `product` - The product to display.
+/// * `product` - The product to display
 ///
 /// **Returns**  
 ///
-/// A component that displays the product.
+/// A component that displays the product
 #[component]
 pub fn ProductCard(product: Product) -> Element {
-    let image_url = product
+    // Get the image URL
+    let image_url: String = product
         .image
         .as_ref()
-        .and_then(|img| img.source_url.clone())
+        .and_then(|img: &ProductImage| img.source_url.clone())
         .unwrap_or_default();
 
     rsx! {

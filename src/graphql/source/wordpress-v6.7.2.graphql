@@ -4285,9 +4285,9 @@ enum ContentTypesOfPostFormatEnum {
 }
 
 """
-Allowed Content Types of the ProductCategory taxonomy.
+Allowed Content Types of the Category taxonomy.
 """
-enum ContentTypesOfProductCategoryEnum {
+enum ContentTypesOfCategoryEnum {
   """
   The Type of Content object
   """
@@ -4891,7 +4891,7 @@ type Coupon implements Node {
   """
   Connection between the Coupon type and the productCategory type
   """
-  excludedProductCategories(
+  excludedCategories(
     """
     The number of items to return after the referenced "after" cursor
     """
@@ -4915,8 +4915,8 @@ type Coupon implements Node {
     """
     Arguments for filtering the connection
     """
-    where: CouponToExcludedProductCategoriesConnectionWhereArgs
-  ): CouponToExcludedProductCategoriesConnection
+    where: CouponToExcludedCategoriesConnectionWhereArgs
+  ): CouponToExcludedCategoriesConnection
 
   """
   Connection between the Coupon type and the ProductUnion type
@@ -5030,8 +5030,8 @@ type Coupon implements Node {
     """
     Arguments for filtering the connection
     """
-    where: CouponToProductCategoryConnectionWhereArgs
-  ): CouponToProductCategoryConnection
+    where: CouponToCategoryConnectionWhereArgs
+  ): CouponToCategoryConnection
 
   """
   Connection between the Coupon type and the ProductUnion type
@@ -5407,27 +5407,27 @@ input CouponToCustomerConnectionWhereArgs {
 """
 Connection between the Coupon type and the productCategory type
 """
-type CouponToExcludedProductCategoriesConnection implements ProductCategoryConnection & Connection {
+type CouponToExcludedCategoriesConnection implements CategoryConnection & Connection {
   """
-  Edges for the CouponToExcludedProductCategoriesConnection connection
+  Edges for the CouponToExcludedCategoriesConnection connection
   """
-  edges: [CouponToExcludedProductCategoriesConnectionEdge!]!
+  edges: [CouponToExcludedCategoriesConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
   """
-  nodes: [ProductCategory!]!
+  nodes: [Category!]!
 
   """
   Information about pagination in a connection.
   """
-  pageInfo: CouponToExcludedProductCategoriesConnectionPageInfo!
+  pageInfo: CouponToExcludedCategoriesConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type CouponToExcludedProductCategoriesConnectionEdge implements ProductCategoryConnectionEdge & Edge {
+type CouponToExcludedCategoriesConnectionEdge implements CategoryConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -5436,13 +5436,13 @@ type CouponToExcludedProductCategoriesConnectionEdge implements ProductCategoryC
   """
   The item at the end of the edge
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Page Info on the &quot;CouponToExcludedProductCategoriesConnection&quot;
+Page Info on the &quot;CouponToExcludedCategoriesConnection&quot;
 """
-type CouponToExcludedProductCategoriesConnectionPageInfo implements ProductCategoryConnectionPageInfo & WPPageInfo & PageInfo {
+type CouponToExcludedCategoriesConnectionPageInfo implements CategoryConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -5465,9 +5465,9 @@ type CouponToExcludedProductCategoriesConnectionPageInfo implements ProductCateg
 }
 
 """
-Arguments for filtering the CouponToExcludedProductCategoriesConnection connection
+Arguments for filtering the CouponToExcludedCategoriesConnection connection
 """
-input CouponToExcludedProductCategoriesConnectionWhereArgs {
+input CouponToExcludedCategoriesConnectionWhereArgs {
   """
   Unique cache key to be produced when this query is stored in an object cache. Default is 'core'.
   """
@@ -5834,27 +5834,27 @@ input CouponToExcludedProductsConnectionWhereArgs {
 """
 Connection between the Coupon type and the productCategory type
 """
-type CouponToProductCategoryConnection implements ProductCategoryConnection & Connection {
+type CouponToCategoryConnection implements CategoryConnection & Connection {
   """
-  Edges for the CouponToProductCategoryConnection connection
+  Edges for the CouponToCategoryConnection connection
   """
-  edges: [CouponToProductCategoryConnectionEdge!]!
+  edges: [CouponToCategoryConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
   """
-  nodes: [ProductCategory!]!
+  nodes: [Category!]!
 
   """
   Information about pagination in a connection.
   """
-  pageInfo: CouponToProductCategoryConnectionPageInfo!
+  pageInfo: CouponToCategoryConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type CouponToProductCategoryConnectionEdge implements ProductCategoryConnectionEdge & Edge {
+type CouponToCategoryConnectionEdge implements CategoryConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -5863,13 +5863,13 @@ type CouponToProductCategoryConnectionEdge implements ProductCategoryConnectionE
   """
   The item at the end of the edge
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Page Info on the &quot;CouponToProductCategoryConnection&quot;
+Page Info on the &quot;CouponToCategoryConnection&quot;
 """
-type CouponToProductCategoryConnectionPageInfo implements ProductCategoryConnectionPageInfo & WPPageInfo & PageInfo {
+type CouponToCategoryConnectionPageInfo implements CategoryConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -5892,9 +5892,9 @@ type CouponToProductCategoryConnectionPageInfo implements ProductCategoryConnect
 }
 
 """
-Arguments for filtering the CouponToProductCategoryConnection connection
+Arguments for filtering the CouponToCategoryConnection connection
 """
-input CouponToProductCategoryConnectionWhereArgs {
+input CouponToCategoryConnectionWhereArgs {
   """
   Unique cache key to be produced when this query is stored in an object cache. Default is 'core'.
   """
@@ -6473,7 +6473,7 @@ input CreateCouponInput {
   """
   List of category IDs the coupon does not apply to.
   """
-  excludedProductCategories: [Int]
+  excludedCategories: [Int]
 
   """
   List of product IDs the coupon cannot be used on.
@@ -6996,9 +6996,9 @@ type CreatePostPayload {
 }
 
 """
-Input for the createProductCategory mutation.
+Input for the createCategory mutation.
 """
-input CreateProductCategoryInput {
+input CreateCategoryInput {
   """
   The slug that the product_cat will be an alias of
   """
@@ -7043,9 +7043,9 @@ input CreateProductCategoryInput {
 }
 
 """
-The payload for the createProductCategory mutation.
+The payload for the createCategory mutation.
 """
-type CreateProductCategoryPayload {
+type CreateCategoryPayload {
   """
   If a &#039;clientMutationId&#039; input is provided to the mutation, it will
   be returned as output on the mutation. This ID can be used by the client to
@@ -7056,7 +7056,7 @@ type CreateProductCategoryPayload {
   """
   The created product_cat
   """
-  productCategory: ProductCategory
+  productCategory: Category
 }
 
 """
@@ -7106,7 +7106,7 @@ input CreateProductInput {
   """
   Set connections between the Product and productCategories
   """
-  productCategories: ProductProductCategoriesInput
+  productCategories: ProductCategoriesInput
 
   """
   Set connections between the Product and productTags
@@ -9905,9 +9905,9 @@ type DeletePostPayload {
 }
 
 """
-Input for the deleteProductCategory mutation.
+Input for the deleteCategory mutation.
 """
-input DeleteProductCategoryInput {
+input DeleteCategoryInput {
   """
   This is an ID that can be passed to a mutation by the client to track the
   progress of mutations and catch possible duplicate mutation submissions.
@@ -9921,9 +9921,9 @@ input DeleteProductCategoryInput {
 }
 
 """
-The payload for the deleteProductCategory mutation.
+The payload for the deleteCategory mutation.
 """
-type DeleteProductCategoryPayload {
+type DeleteCategoryPayload {
   """
   If a &#039;clientMutationId&#039; input is provided to the mutation, it will
   be returned as output on the mutation. This ID can be used by the client to
@@ -9939,7 +9939,7 @@ type DeleteProductCategoryPayload {
   """
   The deleted term object
   """
-  productCategory: ProductCategory
+  productCategory: Category
 }
 
 """
@@ -11062,8 +11062,8 @@ interface DownloadableProduct {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -12353,8 +12353,8 @@ type ExternalProduct implements Node & Product & ContentNode & UniformResourceId
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -13886,8 +13886,8 @@ type GroupProduct implements Node & Product & ContentNode & UniformResourceIdent
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -15833,8 +15833,8 @@ interface InventoriedProduct {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -18217,7 +18217,7 @@ union MenuItemObjectUnion =
   | Page
   | Category
   | Tag
-  | ProductCategory
+  | Category
   | ProductTag
 
 """
@@ -25613,8 +25613,8 @@ interface Product {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   Connection between the Product type and the productTag type
@@ -26182,7 +26182,7 @@ enum ProductAttributeTypesEnum {
 """
 The productCategory type
 """
-type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & DatabaseIdentifier & HierarchicalTermNode & HierarchicalNode & MenuItemLinkable {
+type Category implements Node & TermNode & UniformResourceIdentifiable & DatabaseIdentifier & HierarchicalTermNode & HierarchicalNode & MenuItemLinkable {
   """
   The ancestors of the node. Default ordered as lowest (closest to the child) to highest (closest to the root).
   """
@@ -26206,7 +26206,7 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
     Cursor used along with the "last" argument to reference where in the dataset to get data
     """
     before: String
-  ): ProductCategoryToAncestorsProductCategoryConnection
+  ): CategoryToAncestorsCategoryConnection
 
   """
   Connection between the productCategory type and its children productCategories.
@@ -26235,11 +26235,11 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
     """
     Arguments for filtering the connection
     """
-    where: ProductCategoryToProductCategoryConnectionWhereArgs
-  ): ProductCategoryToProductCategoryConnection
+    where: CategoryToCategoryConnectionWhereArgs
+  ): CategoryToCategoryConnection
 
   """
-  Connection between the ProductCategory type and the ContentNode type
+  Connection between the Category type and the ContentNode type
   """
   contentNodes(
     """
@@ -26265,8 +26265,8 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
     """
     Arguments for filtering the connection
     """
-    where: ProductCategoryToContentNodeConnectionWhereArgs
-  ): ProductCategoryToContentNodeConnection
+    where: CategoryToContentNodeConnectionWhereArgs
+  ): CategoryToContentNodeConnection
 
   """
   The number of objects connected to the object
@@ -26286,7 +26286,7 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
   """
   Product category display type
   """
-  display: ProductCategoryDisplay
+  display: CategoryDisplay
 
   """
   Connection between the TermNode type and the EnqueuedScript type
@@ -26396,7 +26396,7 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
   """
   Connection between the productCategory type and its parent productCategory.
   """
-  parent: ProductCategoryToParentProductCategoryConnectionEdge
+  parent: CategoryToParentCategoryConnectionEdge
 
   """
   Database id of the parent node
@@ -26415,7 +26415,7 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
     @deprecated(reason: "Deprecated in favor of databaseId")
 
   """
-  Connection between the ProductCategory type and the Product type
+  Connection between the Category type and the Product type
   """
   products(
     """
@@ -26441,8 +26441,8 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
     """
     Arguments for filtering the connection
     """
-    where: ProductCategoryToProductConnectionWhereArgs
-  ): ProductCategoryToProductConnection
+    where: CategoryToProductConnectionWhereArgs
+  ): CategoryToProductConnection
 
   """
   An alphanumeric identifier for the object unique to its type.
@@ -26450,9 +26450,9 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
   slug: String
 
   """
-  Connection between the ProductCategory type and the Taxonomy type
+  Connection between the Category type and the Taxonomy type
   """
-  taxonomy: ProductCategoryToTaxonomyConnectionEdge
+  taxonomy: CategoryToTaxonomyConnectionEdge
 
   """
   The name of the taxonomy that the object is associated with
@@ -26478,27 +26478,27 @@ type ProductCategory implements Node & TermNode & UniformResourceIdentifiable & 
 """
 Connection to productCategory Nodes
 """
-interface ProductCategoryConnection {
+interface CategoryConnection {
   """
   A list of edges (relational context) between RootQuery and connected productCategory Nodes
   """
-  edges: [ProductCategoryConnectionEdge!]!
+  edges: [CategoryConnectionEdge!]!
 
   """
   A list of connected productCategory Nodes
   """
-  nodes: [ProductCategory!]!
+  nodes: [Category!]!
 
   """
   Information about pagination in a connection.
   """
-  pageInfo: ProductCategoryConnectionPageInfo!
+  pageInfo: CategoryConnectionPageInfo!
 }
 
 """
 Edge between a Node and a connected productCategory
 """
-interface ProductCategoryConnectionEdge {
+interface CategoryConnectionEdge {
   """
   Opaque reference to the nodes position in the connection. Value can be used with pagination args.
   """
@@ -26507,13 +26507,13 @@ interface ProductCategoryConnectionEdge {
   """
   The connected productCategory Node
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Page Info on the connected ProductCategoryConnectionEdge
+Page Info on the connected CategoryConnectionEdge
 """
-interface ProductCategoryConnectionPageInfo {
+interface CategoryConnectionPageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -26538,7 +26538,7 @@ interface ProductCategoryConnectionPageInfo {
 """
 Product category display type enumeration
 """
-enum ProductCategoryDisplay {
+enum CategoryDisplay {
   """
   Display both products and subcategories of this category.
   """
@@ -26563,7 +26563,7 @@ enum ProductCategoryDisplay {
 """
 The Type of Identifier used to fetch a single resource. Default is ID.
 """
-enum ProductCategoryIdType {
+enum CategoryIdType {
   """
   The Database ID for the node
   """
@@ -26591,29 +26591,29 @@ enum ProductCategoryIdType {
 }
 
 """
-Connection between the ProductCategory type and the productCategory type
+Connection between the Category type and the productCategory type
 """
-type ProductCategoryToAncestorsProductCategoryConnection implements ProductCategoryConnection & Connection {
+type CategoryToAncestorsCategoryConnection implements CategoryConnection & Connection {
   """
-  Edges for the ProductCategoryToAncestorsProductCategoryConnection connection
+  Edges for the CategoryToAncestorsCategoryConnection connection
   """
-  edges: [ProductCategoryToAncestorsProductCategoryConnectionEdge!]!
+  edges: [CategoryToAncestorsCategoryConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
   """
-  nodes: [ProductCategory!]!
+  nodes: [Category!]!
 
   """
   Information about pagination in a connection.
   """
-  pageInfo: ProductCategoryToAncestorsProductCategoryConnectionPageInfo!
+  pageInfo: CategoryToAncestorsCategoryConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type ProductCategoryToAncestorsProductCategoryConnectionEdge implements ProductCategoryConnectionEdge & Edge {
+type CategoryToAncestorsCategoryConnectionEdge implements CategoryConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -26622,13 +26622,13 @@ type ProductCategoryToAncestorsProductCategoryConnectionEdge implements ProductC
   """
   The item at the end of the edge
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Page Info on the &quot;ProductCategoryToAncestorsProductCategoryConnection&quot;
+Page Info on the &quot;CategoryToAncestorsCategoryConnection&quot;
 """
-type ProductCategoryToAncestorsProductCategoryConnectionPageInfo implements ProductCategoryConnectionPageInfo & WPPageInfo & PageInfo {
+type CategoryToAncestorsCategoryConnectionPageInfo implements CategoryConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -26651,13 +26651,13 @@ type ProductCategoryToAncestorsProductCategoryConnectionPageInfo implements Prod
 }
 
 """
-Connection between the ProductCategory type and the ContentNode type
+Connection between the Category type and the ContentNode type
 """
-type ProductCategoryToContentNodeConnection implements ContentNodeConnection & Connection {
+type CategoryToContentNodeConnection implements ContentNodeConnection & Connection {
   """
-  Edges for the ProductCategoryToContentNodeConnection connection
+  Edges for the CategoryToContentNodeConnection connection
   """
-  edges: [ProductCategoryToContentNodeConnectionEdge!]!
+  edges: [CategoryToContentNodeConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
@@ -26667,13 +26667,13 @@ type ProductCategoryToContentNodeConnection implements ContentNodeConnection & C
   """
   Information about pagination in a connection.
   """
-  pageInfo: ProductCategoryToContentNodeConnectionPageInfo!
+  pageInfo: CategoryToContentNodeConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type ProductCategoryToContentNodeConnectionEdge implements ContentNodeConnectionEdge & Edge {
+type CategoryToContentNodeConnectionEdge implements ContentNodeConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -26686,9 +26686,9 @@ type ProductCategoryToContentNodeConnectionEdge implements ContentNodeConnection
 }
 
 """
-Page Info on the &quot;ProductCategoryToContentNodeConnection&quot;
+Page Info on the &quot;CategoryToContentNodeConnection&quot;
 """
-type ProductCategoryToContentNodeConnectionPageInfo implements ContentNodeConnectionPageInfo & WPPageInfo & PageInfo {
+type CategoryToContentNodeConnectionPageInfo implements ContentNodeConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -26711,13 +26711,13 @@ type ProductCategoryToContentNodeConnectionPageInfo implements ContentNodeConnec
 }
 
 """
-Arguments for filtering the ProductCategoryToContentNodeConnection connection
+Arguments for filtering the CategoryToContentNodeConnection connection
 """
-input ProductCategoryToContentNodeConnectionWhereArgs {
+input CategoryToContentNodeConnectionWhereArgs {
   """
   The Types of content to filter
   """
-  contentTypes: [ContentTypesOfProductCategoryEnum]
+  contentTypes: [ContentTypesOfCategoryEnum]
 
   """
   Filter the connection based on dates
@@ -26806,9 +26806,9 @@ input ProductCategoryToContentNodeConnectionWhereArgs {
 }
 
 """
-Connection between the ProductCategory type and the productCategory type
+Connection between the Category type and the productCategory type
 """
-type ProductCategoryToParentProductCategoryConnectionEdge implements OneToOneConnection & Edge & ProductCategoryConnectionEdge {
+type CategoryToParentCategoryConnectionEdge implements OneToOneConnection & Edge & CategoryConnectionEdge {
   """
   Opaque reference to the nodes position in the connection. Value can be used with pagination args.
   """
@@ -26817,33 +26817,33 @@ type ProductCategoryToParentProductCategoryConnectionEdge implements OneToOneCon
   """
   The node of the connection, without the edges
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Connection between the ProductCategory type and the productCategory type
+Connection between the Category type and the productCategory type
 """
-type ProductCategoryToProductCategoryConnection implements ProductCategoryConnection & Connection {
+type CategoryToCategoryConnection implements CategoryConnection & Connection {
   """
-  Edges for the ProductCategoryToProductCategoryConnection connection
+  Edges for the CategoryToCategoryConnection connection
   """
-  edges: [ProductCategoryToProductCategoryConnectionEdge!]!
+  edges: [CategoryToCategoryConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
   """
-  nodes: [ProductCategory!]!
+  nodes: [Category!]!
 
   """
   Information about pagination in a connection.
   """
-  pageInfo: ProductCategoryToProductCategoryConnectionPageInfo!
+  pageInfo: CategoryToCategoryConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type ProductCategoryToProductCategoryConnectionEdge implements ProductCategoryConnectionEdge & Edge {
+type CategoryToCategoryConnectionEdge implements CategoryConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -26852,13 +26852,13 @@ type ProductCategoryToProductCategoryConnectionEdge implements ProductCategoryCo
   """
   The item at the end of the edge
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Page Info on the &quot;ProductCategoryToProductCategoryConnection&quot;
+Page Info on the &quot;CategoryToCategoryConnection&quot;
 """
-type ProductCategoryToProductCategoryConnectionPageInfo implements ProductCategoryConnectionPageInfo & WPPageInfo & PageInfo {
+type CategoryToCategoryConnectionPageInfo implements CategoryConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -26881,9 +26881,9 @@ type ProductCategoryToProductCategoryConnectionPageInfo implements ProductCatego
 }
 
 """
-Arguments for filtering the ProductCategoryToProductCategoryConnection connection
+Arguments for filtering the CategoryToCategoryConnection connection
 """
-input ProductCategoryToProductCategoryConnectionWhereArgs {
+input CategoryToCategoryConnectionWhereArgs {
   """
   Unique cache key to be produced when this query is stored in an object cache. Default is 'core'.
   """
@@ -26988,13 +26988,13 @@ input ProductCategoryToProductCategoryConnectionWhereArgs {
 }
 
 """
-Connection between the ProductCategory type and the Product type
+Connection between the Category type and the Product type
 """
-type ProductCategoryToProductConnection implements ProductConnection & Connection {
+type CategoryToProductConnection implements ProductConnection & Connection {
   """
-  Edges for the ProductCategoryToProductConnection connection
+  Edges for the CategoryToProductConnection connection
   """
-  edges: [ProductCategoryToProductConnectionEdge!]!
+  edges: [CategoryToProductConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
@@ -27004,13 +27004,13 @@ type ProductCategoryToProductConnection implements ProductConnection & Connectio
   """
   Information about pagination in a connection.
   """
-  pageInfo: ProductCategoryToProductConnectionPageInfo!
+  pageInfo: CategoryToProductConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type ProductCategoryToProductConnectionEdge implements ProductConnectionEdge & Edge {
+type CategoryToProductConnectionEdge implements ProductConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -27023,9 +27023,9 @@ type ProductCategoryToProductConnectionEdge implements ProductConnectionEdge & E
 }
 
 """
-Page Info on the &quot;ProductCategoryToProductConnection&quot;
+Page Info on the &quot;CategoryToProductConnection&quot;
 """
-type ProductCategoryToProductConnectionPageInfo implements ProductConnectionPageInfo & WPPageInfo & PageInfo {
+type CategoryToProductConnectionPageInfo implements ProductConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -27048,9 +27048,9 @@ type ProductCategoryToProductConnectionPageInfo implements ProductConnectionPage
 }
 
 """
-Arguments for filtering the ProductCategoryToProductConnection connection
+Arguments for filtering the CategoryToProductConnection connection
 """
-input ProductCategoryToProductConnectionWhereArgs {
+input CategoryToProductConnectionWhereArgs {
   """
   Limit result set to products with selected global attribute queries.
   """
@@ -27243,9 +27243,9 @@ input ProductCategoryToProductConnectionWhereArgs {
 }
 
 """
-Connection between the ProductCategory type and the Taxonomy type
+Connection between the Category type and the Taxonomy type
 """
-type ProductCategoryToTaxonomyConnectionEdge implements OneToOneConnection & Edge & TaxonomyConnectionEdge {
+type CategoryToTaxonomyConnectionEdge implements OneToOneConnection & Edge & TaxonomyConnectionEdge {
   """
   Opaque reference to the nodes position in the connection. Value can be used with pagination args.
   """
@@ -27390,7 +27390,7 @@ enum ProductIdTypeEnum {
 """
 Set relationships between the Product to productCategories
 """
-input ProductProductCategoriesInput {
+input ProductCategoriesInput {
   """
   If true, this will append the productCategory to existing related
   productCategories. If false, this will replace existing relationships. Default true.
@@ -27400,7 +27400,7 @@ input ProductProductCategoriesInput {
   """
   The input list of items to set.
   """
-  nodes: [ProductProductCategoriesNodeInput]
+  nodes: [ProductCategoriesNodeInput]
 }
 
 """
@@ -27410,7 +27410,7 @@ valid existing terms, and the site is configured to allow terms to be created
 during post mutations, a term will be created using the Name if it exists in the
 input, then fallback to the slug if it exists.
 """
-input ProductProductCategoriesNodeInput {
+input ProductCategoriesNodeInput {
   """
   The description of the productCategory. This field is used to set a
   description of the productCategory if a new one is created during the mutation.
@@ -29423,27 +29423,27 @@ input ProductToPreviewConnectionWhereArgs {
 """
 Connection between the Product type and the productCategory type
 """
-type ProductToProductCategoryConnection implements ProductCategoryConnection & Connection {
+type ProductToCategoryConnection implements CategoryConnection & Connection {
   """
-  Edges for the ProductToProductCategoryConnection connection
+  Edges for the ProductToCategoryConnection connection
   """
-  edges: [ProductToProductCategoryConnectionEdge!]!
+  edges: [ProductToCategoryConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
   """
-  nodes: [ProductCategory!]!
+  nodes: [Category!]!
 
   """
   Information about pagination in a connection.
   """
-  pageInfo: ProductToProductCategoryConnectionPageInfo!
+  pageInfo: ProductToCategoryConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type ProductToProductCategoryConnectionEdge implements ProductCategoryConnectionEdge & Edge {
+type ProductToCategoryConnectionEdge implements CategoryConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -29452,13 +29452,13 @@ type ProductToProductCategoryConnectionEdge implements ProductCategoryConnection
   """
   The item at the end of the edge
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Page Info on the &quot;ProductToProductCategoryConnection&quot;
+Page Info on the &quot;ProductToCategoryConnection&quot;
 """
-type ProductToProductCategoryConnectionPageInfo implements ProductCategoryConnectionPageInfo & WPPageInfo & PageInfo {
+type ProductToCategoryConnectionPageInfo implements CategoryConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -29481,9 +29481,9 @@ type ProductToProductCategoryConnectionPageInfo implements ProductCategoryConnec
 }
 
 """
-Arguments for filtering the ProductToProductCategoryConnection connection
+Arguments for filtering the ProductToCategoryConnection connection
 """
-input ProductToProductCategoryConnectionWhereArgs {
+input ProductToCategoryConnectionWhereArgs {
   """
   Unique cache key to be produced when this query is stored in an object cache. Default is 'core'.
   """
@@ -32458,8 +32458,8 @@ interface ProductUnion {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -33440,8 +33440,8 @@ interface ProductVariation {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -34694,8 +34694,8 @@ interface ProductWithAttributes {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -35662,8 +35662,8 @@ interface ProductWithDimensions {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -36525,8 +36525,8 @@ interface ProductWithPricing {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -37438,8 +37438,8 @@ interface ProductWithVariations {
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -38962,14 +38962,14 @@ type RootMutation {
   ): CreateProductPayload
 
   """
-  The createProductCategory mutation
+  The createCategory mutation
   """
-  createProductCategory(
+  createCategory(
     """
-    Input for the createProductCategory mutation
+    Input for the createCategory mutation
     """
-    input: CreateProductCategoryInput!
-  ): CreateProductCategoryPayload
+    input: CreateCategoryInput!
+  ): CreateCategoryPayload
 
   """
   The createProductTag mutation
@@ -39182,14 +39182,14 @@ type RootMutation {
   ): DeleteProductPayload
 
   """
-  The deleteProductCategory mutation
+  The deleteCategory mutation
   """
-  deleteProductCategory(
+  deleteCategory(
     """
-    Input for the deleteProductCategory mutation
+    Input for the deleteCategory mutation
     """
-    input: DeleteProductCategoryInput!
-  ): DeleteProductCategoryPayload
+    input: DeleteCategoryInput!
+  ): DeleteCategoryPayload
 
   """
   The deleteProductTag mutation
@@ -39592,14 +39592,14 @@ type RootMutation {
   ): UpdateProductPayload
 
   """
-  The updateProductCategory mutation
+  The updateCategory mutation
   """
-  updateProductCategory(
+  updateCategory(
     """
-    Input for the updateProductCategory mutation
+    Input for the updateCategory mutation
     """
-    input: UpdateProductCategoryInput!
-  ): UpdateProductCategoryPayload
+    input: UpdateCategoryInput!
+  ): UpdateCategoryPayload
 
   """
   The updateProductTag mutation
@@ -40705,8 +40705,8 @@ type RootQuery {
     """
     Arguments for filtering the connection
     """
-    where: RootQueryToProductCategoryConnectionWhereArgs
-  ): RootQueryToProductCategoryConnection
+    where: RootQueryToCategoryConnectionWhereArgs
+  ): RootQueryToCategoryConnection
 
   """
   A 0bject
@@ -40720,8 +40720,8 @@ type RootQuery {
     """
     Type of unique identifier to fetch by. Default is Global ID
     """
-    idType: ProductCategoryIdType
-  ): ProductCategory
+    idType: CategoryIdType
+  ): Category
 
   """
   A 0bject
@@ -43612,27 +43612,27 @@ input RootQueryToPostFormatConnectionWhereArgs {
 """
 Connection between the RootQuery type and the productCategory type
 """
-type RootQueryToProductCategoryConnection implements ProductCategoryConnection & Connection {
+type RootQueryToCategoryConnection implements CategoryConnection & Connection {
   """
-  Edges for the RootQueryToProductCategoryConnection connection
+  Edges for the RootQueryToCategoryConnection connection
   """
-  edges: [RootQueryToProductCategoryConnectionEdge!]!
+  edges: [RootQueryToCategoryConnectionEdge!]!
 
   """
   The nodes of the connection, without the edges
   """
-  nodes: [ProductCategory!]!
+  nodes: [Category!]!
 
   """
   Information about pagination in a connection.
   """
-  pageInfo: RootQueryToProductCategoryConnectionPageInfo!
+  pageInfo: RootQueryToCategoryConnectionPageInfo!
 }
 
 """
 An edge in a connection
 """
-type RootQueryToProductCategoryConnectionEdge implements ProductCategoryConnectionEdge & Edge {
+type RootQueryToCategoryConnectionEdge implements CategoryConnectionEdge & Edge {
   """
   A cursor for use in pagination
   """
@@ -43641,13 +43641,13 @@ type RootQueryToProductCategoryConnectionEdge implements ProductCategoryConnecti
   """
   The item at the end of the edge
   """
-  node: ProductCategory!
+  node: Category!
 }
 
 """
-Page Info on the &quot;RootQueryToProductCategoryConnection&quot;
+Page Info on the &quot;RootQueryToCategoryConnection&quot;
 """
-type RootQueryToProductCategoryConnectionPageInfo implements ProductCategoryConnectionPageInfo & WPPageInfo & PageInfo {
+type RootQueryToCategoryConnectionPageInfo implements CategoryConnectionPageInfo & WPPageInfo & PageInfo {
   """
   When paginating forwards, the cursor to continue.
   """
@@ -43670,9 +43670,9 @@ type RootQueryToProductCategoryConnectionPageInfo implements ProductCategoryConn
 }
 
 """
-Arguments for filtering the RootQueryToProductCategoryConnection connection
+Arguments for filtering the RootQueryToCategoryConnection connection
 """
-input RootQueryToProductCategoryConnectionWhereArgs {
+input RootQueryToCategoryConnectionWhereArgs {
   """
   Unique cache key to be produced when this query is stored in an object cache. Default is 'core'.
   """
@@ -48331,8 +48331,8 @@ type SimpleProduct implements Node & Product & ContentNode & UniformResourceIden
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -49579,8 +49579,8 @@ type SimpleProductVariation implements Node & ProductVariation & ContentNode & U
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
@@ -52301,7 +52301,7 @@ input UpdateCouponInput {
   """
   List of category IDs the coupon does not apply to.
   """
-  excludedProductCategories: [Int]
+  excludedCategories: [Int]
 
   """
   List of product IDs the coupon cannot be used on.
@@ -53094,9 +53094,9 @@ type UpdatePostPayload {
 }
 
 """
-Input for the updateProductCategory mutation.
+Input for the updateCategory mutation.
 """
-input UpdateProductCategoryInput {
+input UpdateCategoryInput {
   """
   The slug that the product_cat will be an alias of
   """
@@ -53146,9 +53146,9 @@ input UpdateProductCategoryInput {
 }
 
 """
-The payload for the updateProductCategory mutation.
+The payload for the updateCategory mutation.
 """
-type UpdateProductCategoryPayload {
+type UpdateCategoryPayload {
   """
   If a &#039;clientMutationId&#039; input is provided to the mutation, it will
   be returned as output on the mutation. This ID can be used by the client to
@@ -53159,7 +53159,7 @@ type UpdateProductCategoryPayload {
   """
   The created product_cat
   """
-  productCategory: ProductCategory
+  productCategory: Category
 }
 
 """
@@ -53219,7 +53219,7 @@ input UpdateProductInput {
   """
   Set connections between the Product and productCategories
   """
-  productCategories: ProductProductCategoriesInput
+  productCategories: ProductCategoriesInput
 
   """
   Set connections between the Product and productTags
@@ -56669,8 +56669,8 @@ type VariableProduct implements Node & Product & ContentNode & UniformResourceId
     """
     Arguments for filtering the connection
     """
-    where: ProductToProductCategoryConnectionWhereArgs
-  ): ProductToProductCategoryConnection
+    where: ProductToCategoryConnectionWhereArgs
+  ): ProductToCategoryConnection
 
   """
   The id field matches the WP_Post-&gt;ID field.
