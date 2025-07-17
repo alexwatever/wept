@@ -16,15 +16,14 @@ This list is a work in progress. Features are implemented based on what I feel l
     - [x] Create Post page routing and components
     - [x] Create Product page routing and components
     - [x] Create Category page routing and components
-        - [ ] Implement Pagination for category products
     - [ ] Create Contact page routing and components
     - [ ] Create Navigation components (header, footer, menu, etc.)
     - [ ] Create Search queries, routing, and components
         - [ ] Implement Pagination for search results
 - [ ] Integrations:
-    - [ ] reCAPTCHA Enterprise
     - [ ] Google Analytics 4
     - [ ] Schema.org
+    - [ ] reCAPTCHA Enterprise
 - [ ] Update WordPress settings on install:
     - [ ] GraphQL > General Settings > Enable GraphQL Debug Mode
     - [ ] GraphQL > General Settings > Enable Public Introspection
