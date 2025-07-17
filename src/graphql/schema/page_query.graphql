@@ -1,0 +1,11 @@
+# Page by slug
+# `$slug` - The page slug
+query PageQuery($slug: ID!) {
+  page(id: $slug, idType: URI) {
+    id
+    title
+    content
+    slug
+    date
+  }
+} 

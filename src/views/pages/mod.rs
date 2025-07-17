@@ -6,5 +6,8 @@ pub mod categories;
 pub mod category;
 pub mod errors;
 pub mod home;
+pub mod page;
+pub mod pages;
 pub mod post;
+pub mod posts;
 pub mod product;

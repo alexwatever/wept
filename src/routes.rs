@@ -5,7 +5,7 @@ use crate::views::{
     layouts::MainLayout,
     pages::{
         categories::CategoriesPage, category::CategoryPage, errors::NotFoundPage, home::HomePage,
-        post::PostPage, product::ProductPage,
+        page::PagePage, pages::PagesPage, post::PostPage, posts::PostsPage, product::ProductPage,
     },
 };
 
@@ -37,6 +37,18 @@ pub enum Routes {
     #[route("/category/:slug")]
     CategoryPage { slug: String },
     
+    /// Route for the Pages page.
+    #[route("/pages")]
+    PagesPage {},
+
+    /// Route for the Page page.
+    #[route("/page/:slug")]
+    PagePage { slug: String },
+
+    /// Route for the Posts page.
+    #[route("/posts")]
+    PostsPage {},
+
     /// Catch-all route (404).
     #[route("/:..route")]
     NotFoundPage { route: Vec<String>, message: Option<String> },

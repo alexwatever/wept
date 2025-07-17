@@ -24,6 +24,18 @@ pub fn Nav() -> Element {
                                 "Categories"
                             }
                         }
+                        li { class: "mr-12",
+                            Link { class: "hover:text-gray-600",
+                                to: Routes::PagesPage {},
+                                "Pages"
+                            }
+                        }
+                        li { class: "mr-12",
+                            Link { class: "hover:text-gray-600",
+                                to: Routes::PostsPage {},
+                                "Posts"
+                            }
+                        }
                     }
 
                     // Search

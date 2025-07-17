@@ -1,0 +1,21 @@
+# Pages
+# `$first` - The number of items to return after the referenced "after" cursor (ie. page size)
+# `$after` - Cursor used along with the "first" argument to reference where in the dataset to get data
+query PagesQuery($first: Int, $after: String) {
+  pages(first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        pageId
+        title
+        slug
+        uri
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+} 

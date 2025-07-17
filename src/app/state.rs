@@ -105,22 +105,8 @@ impl Env {
     ///
     /// Attempts to load from .env file first (on non-WASM), then uses fallbacks.
     fn default() -> Self {
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            match envy::from_env::<Env>() {
-                Ok(env_vars) => env_vars,
-                Err(err) => {
-                    warn!("Failed to load .env file ({err:?}), using fallback configuration.");
-                    Self::default_with_fallbacks()
-                }
-            }
-        }
-        #[cfg(target_arch = "wasm32")]
-        {
-            // For WASM, always use fallbacks as environment variables are not available.
-            warn!("Running in WASM, using fallback configuration for Env.");
-            Self::default_with_fallbacks()
-        }
+        warn!("Using fallback configuration for Env.");
+        Self::default_with_fallbacks()
     }
 
     /// # Default with Fallbacks
