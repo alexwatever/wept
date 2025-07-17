@@ -61,9 +61,12 @@ pub fn PostsPage() -> Element {
                 div { class: "text-center mb-12",
                     h1 { class: "text-4xl md:text-5xl font-bold text-gray-800", "Posts" }
                 }
-                div { class: "flex flex-wrap -m-4",
+                div { class: "flex flex-wrap",
                     for post in all_posts.read().iter() {
-                        PostCard { post: post.clone() }
+                        div {
+                            class: "p-4 w-full md:w-1/2 lg:w-1/3",
+                            PostCard { post: post.clone() }
+                        }
                     }
                 }
                 if is_loading {

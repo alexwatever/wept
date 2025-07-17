@@ -7,6 +7,7 @@ use crate::{
         pages_query::{PagesQueryPages, PagesQueryPagesEdgesNode, PagesQueryPagesPageInfo},
     },
     models::pagination::Pagination,
+    views::components::common::entity_list::EntityList,
 };
 
 /// Page entity representing a WordPress page
@@ -71,6 +72,13 @@ impl From<PagesQueryPagesEdgesNode> for Page {
 pub struct Pages {
     pub pages: Vec<Page>,
     pub page_info: Option<Pagination>,
+}
+
+impl EntityList for Pages {
+    type Entity = Page;
+    fn as_slice(&self) -> &[Self::Entity] {
+        &self.pages
+    }
 }
 
 impl From<PagesQueryPages> for Pages {

@@ -24,6 +24,7 @@ use crate::{
         },
     },
     models::pagination::Pagination,
+    views::components::common::entity_list::EntityList,
 };
 
 /// Product entity representing a WooCommerce product
@@ -144,6 +145,13 @@ impl From<ProductQueryProduct> for Product {
 pub struct Products {
     pub products: Vec<Product>,
     pub page_info: Option<Pagination>,
+}
+
+impl EntityList for Products {
+    type Entity = Product;
+    fn as_slice(&self) -> &[Self::Entity] {
+        &self.products
+    }
 }
 
 impl From<ProductsQueryProducts> for Products {

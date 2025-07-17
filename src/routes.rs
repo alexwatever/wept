@@ -5,7 +5,8 @@ use crate::views::{
     layouts::MainLayout,
     pages::{
         categories::CategoriesPage, category::CategoryPage, errors::NotFoundPage, home::HomePage,
-        page::PagePage, pages::PagesPage, post::PostPage, posts::PostsPage, product::ProductPage,
+        list::PagesListPage, page::PagePage, post::PostPage, posts::PostsPage,
+        product::ProductPage,
     },
 };
 
@@ -16,7 +17,6 @@ use crate::views::{
 pub enum Routes {
     /// Base layout
     #[layout(MainLayout)]
-    
     /// Route for the Home page.
     #[route("/")]
     HomePage {},
@@ -39,7 +39,7 @@ pub enum Routes {
     
     /// Route for the Pages page.
     #[route("/pages")]
-    PagesPage {},
+    PagesListPage {},
 
     /// Route for the Page page.
     #[route("/page/:slug")]

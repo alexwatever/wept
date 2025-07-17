@@ -7,9 +7,9 @@ use crate::{
     views::components::page::page_card::PageCard,
 };
 
-/// Pages page component
+/// Pages list page component
 #[component]
-pub fn PagesPage() -> Element {
+pub fn PagesListPage() -> Element {
     let mut all_pages = use_signal(Vec::<Page>::new);
     let mut current_cursor = use_signal(|| None::<String>);
     let mut page_info = use_signal(|| None::<Pagination>);
@@ -61,9 +61,12 @@ pub fn PagesPage() -> Element {
                 div { class: "text-center mb-12",
                     h1 { class: "text-4xl md:text-5xl font-bold text-gray-800", "Pages" }
                 }
-                div { class: "flex flex-wrap -m-4",
+                div { class: "flex flex-wrap",
                     for page in all_pages.read().iter() {
-                        PageCard { page: page.clone() }
+                        div {
+                            class: "p-4 w-full md:w-1/2 lg:w-1/3",
+                            PageCard { page: page.clone() }
+                        }
                     }
                 }
                 if is_loading {

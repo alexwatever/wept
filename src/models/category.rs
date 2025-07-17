@@ -5,17 +5,20 @@ use super::{
     pagination::Pagination,
     product::{Product, Products},
 };
-use crate::graphql::models::category::{
-    product_categories::{
-        ProductCategoriesProductCategories, ProductCategoriesProductCategoriesEdges,
-        ProductCategoriesProductCategoriesEdgesNode,
-        ProductCategoriesProductCategoriesEdgesNodeImage,
-        ProductCategoriesProductCategoriesPageInfo,
+use crate::{
+    graphql::models::category::{
+        product_categories::{
+            ProductCategoriesProductCategories, ProductCategoriesProductCategoriesEdges,
+            ProductCategoriesProductCategoriesEdgesNode,
+            ProductCategoriesProductCategoriesEdgesNodeImage,
+            ProductCategoriesProductCategoriesPageInfo,
+        },
+        product_category::{
+            ProductCategoryProductCategory, ProductCategoryProductCategoryImage,
+            ProductCategoryProductCategoryProducts, ProductCategoryProductCategoryProductsPageInfo,
+        },
     },
-    product_category::{
-        ProductCategoryProductCategory, ProductCategoryProductCategoryImage,
-        ProductCategoryProductCategoryProducts, ProductCategoryProductCategoryProductsPageInfo,
-    },
+    views::components::common::entity_list::EntityList,
 };
 
 /// Represents a WooCommerce product category
@@ -116,6 +119,13 @@ impl From<ProductCategoriesProductCategoriesEdgesNode> for ProductCategory {
 pub struct ProductCategories {
     pub categories: Vec<ProductCategory>,
     pub page_info: Option<Pagination>,
+}
+
+impl EntityList for ProductCategories {
+    type Entity = ProductCategory;
+    fn as_slice(&self) -> &[Self::Entity] {
+        &self.categories
+    }
 }
 
 impl From<ProductCategoriesProductCategories> for ProductCategories {

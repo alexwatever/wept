@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{models::page::Page, routes::Routes};
+use crate::{models::page::Page, routes::Routes, views::components::common::card::Card};
 
 #[component]
 pub fn PageCard(page: Page) -> Element {
@@ -9,12 +9,8 @@ pub fn PageCard(page: Page) -> Element {
     };
 
     rsx! {
-        div {
-            class: "p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out",
-            h2 {
-                class: "text-2xl font-bold text-gray-800 mb-2",
-                "{page.title.as_deref().unwrap_or_default()}"
-            }
+        Card {
+            title: page.title.unwrap_or_default(),
             a {
                 class: "text-blue-600 hover:text-blue-800 visited:text-purple-600 transition-colors duration-300 ease-in-out",
                 href: "{page_url}",

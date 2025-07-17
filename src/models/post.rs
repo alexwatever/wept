@@ -7,6 +7,7 @@ use crate::{
         posts_query::{PostsQueryPosts, PostsQueryPostsNodes, PostsQueryPostsPageInfo},
     },
     models::pagination::Pagination,
+    views::components::common::entity_list::EntityList,
 };
 
 /// Post entity representing a WordPress post
@@ -71,6 +72,13 @@ impl From<PostsQueryPostsNodes> for Post {
 pub struct Posts {
     pub posts: Vec<Post>,
     pub page_info: Option<Pagination>,
+}
+
+impl EntityList for Posts {
+    type Entity = Post;
+    fn as_slice(&self) -> &[Self::Entity] {
+        &self.posts
+    }
 }
 
 impl From<PostsQueryPosts> for Posts {

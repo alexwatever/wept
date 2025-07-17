@@ -47,6 +47,14 @@ pub trait EntityDisplay: Clone + PartialEq + 'static {
     fn render(&self) -> Element;
 }
 
+/// A trait for types that represent a list of displayable entities.
+pub trait EntityList {
+    /// The type of the entities in the list.
+    type Entity: EntityDisplay;
+    /// Returns the entities as a slice.
+    fn as_slice(&self) -> &[Self::Entity];
+}
+
 /// Implementation of EntityDisplay for Post
 ///
 /// **Arguments**

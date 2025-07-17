@@ -26,7 +26,7 @@ pub fn Nav() -> Element {
                         }
                         li { class: "mr-12",
                             Link { class: "hover:text-gray-600",
-                                to: Routes::PagesPage {},
+                                to: Routes::PagesListPage {},
                                 "Pages"
                             }
                         }
