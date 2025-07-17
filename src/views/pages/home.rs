@@ -34,11 +34,12 @@ pub fn HomePage() -> Element {
 
     rsx! {
         div { class: "container mx-auto p-4",
-            h1 { class: "text-3xl font-bold my-4", "Welcome to Wept" }
-
             // Display Posts
-            h2 { class: "text-2xl font-semibold my-3", "Latest Posts" }
-            {
+            section {
+                header {
+                    h2 { class: "text-2xl font-semibold my-3", "Latest Posts" }
+                }
+
                 match &*posts_data.read() {
                     Some(Ok(Posts { posts, .. })) => {
                         if posts.is_empty() {
@@ -55,8 +56,11 @@ pub fn HomePage() -> Element {
             }
 
             // Display Products
-            h2 { class: "text-2xl font-semibold my-3", "Featured Products" }
-            {
+            section {
+                header {
+                    h2 { class: "text-2xl font-semibold my-3", "Featured Products" }
+                }
+
                 match &*products_data.read() {
                     Some(Ok(Products { products, .. })) => {
                         if products.is_empty() {
@@ -73,8 +77,11 @@ pub fn HomePage() -> Element {
             }
 
             // Display Categories
-            h2 { class: "text-2xl font-semibold my-3", "Featured Categories" }
-            {
+            section {
+                header {
+                    h2 { class: "text-2xl font-semibold my-3", "Featured Categories" }
+                }
+
                 match &*categories_data.read() {
                     Some(Ok(ProductCategories { categories, .. })) => {
                         rsx! { EntityDisplayListComponent { entities: categories.clone() } }

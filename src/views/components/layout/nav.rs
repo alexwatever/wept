@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 // Modules
-use crate::{routes::Routes, views::icons};
+use crate::routes::Routes;
 
 /// Navigation component
 #[component]
@@ -18,28 +18,6 @@ pub fn Nav() -> Element {
                                 "Categories"
                             }
                         }
-                        li { class: "mr-12",
-                            Link { class: "hover:text-gray-600",
-                                to: Routes::NotFoundPage { route: vec!["collection".to_string()], message: None },
-                                "Collection"
-                            }
-                        }
-                        li { class: "mr-12",
-                            Link { class: "hover:text-gray-600",
-                                to: Routes::NotFoundPage { route: vec!["story".to_string()], message: None },
-                                "Story"
-                            }
-                        }
-                    }
-
-                    // Logo
-                    Link { class: "flex-shrink-0 xl:mx-auto text-3xl font-bold font-heading",
-                        to: Routes::HomePage {},
-                        img { class: "h-9",
-                            width: "auto",
-                            alt: "",
-                            src: "https://shuffle.dev/yofte-assets/logos/yofte-logo.svg",
-                        }
                     }
 
                     // Search
@@ -49,12 +27,6 @@ pub fn Nav() -> Element {
                             r#type: "text",
                         }
                     }
-                }
-
-                // Burger menu
-                a { class: "navbar-burger self-center mr-12 xl:hidden",
-                    href: "#",
-                    icons::hamburger_menu {}
                 }
             }
         }
