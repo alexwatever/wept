@@ -14,6 +14,12 @@ pub fn Nav() -> Element {
                     ul { class: "hidden xl:flex font-semibold font-heading",
                         li { class: "mr-12",
                             Link { class: "hover:text-gray-600",
+                                to: Routes::HomePage {},
+                                "Home"
+                            }
+                        }
+                        li { class: "mr-12",
+                            Link { class: "hover:text-gray-600",
                                 to: Routes::CategoriesPage {},
                                 "Categories"
                             }
