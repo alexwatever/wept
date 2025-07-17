@@ -6,9 +6,9 @@ use serde::Deserialize;
 #[derive(Debug)]
 pub struct AppConfig {
     /// Application name from Cargo.toml
-    name: &'static str,
+    _name: &'static str,
     /// Application version from Cargo.toml
-    version: &'static str,
+    _version: &'static str,
 }
 
 impl Default for AppConfig {
@@ -18,8 +18,8 @@ impl Default for AppConfig {
     fn default() -> Self {
         let config: Config = Config::default();
         Self {
-            name: config.name,
-            version: config.version,
+            _name: config.name,
+            _version: config.version,
         }
     }
 }

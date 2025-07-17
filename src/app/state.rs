@@ -17,7 +17,7 @@ pub static STATE: GlobalSignal<State> = Global::new(State::default);
 #[derive(Debug)]
 pub struct State {
     env: Env,
-    config: AppConfig,
+    _config: AppConfig,
 }
 
 impl State {
@@ -27,7 +27,7 @@ impl State {
     pub fn default() -> Self {
         Self {
             env: Env::default(),
-            config: AppConfig::default(),
+            _config: AppConfig::default(),
         }
     }
 

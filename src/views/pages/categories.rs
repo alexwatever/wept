@@ -57,21 +57,19 @@ pub fn CategoriesPage() -> Element {
             if cat_is_initial_load() {
                 all_categories.set(fetched_data.categories.clone());
                 cat_is_initial_load.set(false);
-            } else {
-                if let Some(last_fetched_slug) = fetched_data
-                    .categories
-                    .first()
-                    .and_then(|c| c.slug.as_ref())
+            } else if let Some(last_fetched_slug) = fetched_data
+                .categories
+                .first()
+                .and_then(|c| c.slug.as_ref())
+            {
+                if !all_categories
+                    .read()
+                    .iter()
+                    .any(|ac| ac.slug.as_ref() == Some(last_fetched_slug))
                 {
-                    if !all_categories
-                        .read()
-                        .iter()
-                        .any(|ac| ac.slug.as_ref() == Some(last_fetched_slug))
-                    {
-                        all_categories
-                            .write()
-                            .extend(fetched_data.categories.clone());
-                    }
+                    all_categories
+                        .write()
+                        .extend(fetched_data.categories.clone());
                 }
             }
             cat_page_info.set(fetched_data.page_info.clone());
@@ -90,17 +88,15 @@ pub fn CategoriesPage() -> Element {
             if prod_is_initial_load() {
                 all_products.set(fetched_data.products.clone());
                 prod_is_initial_load.set(false);
-            } else {
-                if let Some(last_fetched_slug) =
-                    fetched_data.products.first().and_then(|p| p.slug.as_ref())
+            } else if let Some(last_fetched_slug) =
+                fetched_data.products.first().and_then(|p| p.slug.as_ref())
+            {
+                if !all_products
+                    .read()
+                    .iter()
+                    .any(|ap| ap.slug.as_ref() == Some(last_fetched_slug))
                 {
-                    if !all_products
-                        .read()
-                        .iter()
-                        .any(|ap| ap.slug.as_ref() == Some(last_fetched_slug))
-                    {
-                        all_products.write().extend(fetched_data.products.clone());
-                    }
+                    all_products.write().extend(fetched_data.products.clone());
                 }
             }
             prod_page_info.set(fetched_data.page_info.clone());
