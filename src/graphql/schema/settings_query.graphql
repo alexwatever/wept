@@ -1,0 +1,10 @@
+query WeptSettingsQuery {
+  page(id: "wept-settings", idType: URI) {
+    weptSettings {
+      copyright
+      email
+      facebook
+      instagram
+    }
+  }
+} 

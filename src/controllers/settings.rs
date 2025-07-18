@@ -1,6 +1,6 @@
 use crate::graphql::{
     client::GraphQLClient,
-    models::footer::{self, FooterQuery},
+    models::settings::{self, WeptSettingsQuery},
 };
 
 /// Settings controller
@@ -13,29 +13,21 @@ impl SettingsController {
         Self {}
     }
 
-    /// Fetches the footer settings from the GraphQL backend.
+    /// Fetches the settings from the GraphQL backend.
     ///
     /// # Returns
     ///
-    /// A `Result` containing the `footer_query::ResponseData` if the query is
+    /// A `Result` containing the `wept_settings_query::ResponseData` if the query is
     /// successful, or an `anyhow::Error` if it fails.
-    pub async fn get_footer_settings(
-        &self,
-    ) -> anyhow::Result<Option<footer::footer_query::ResponseData>> {
+    pub async fn get(&self) -> anyhow::Result<Option<settings::wept_settings_query::ResponseData>> {
         let client = GraphQLClient::new();
-        let variables = footer::footer_query::Variables {};
+        let variables = settings::wept_settings_query::Variables {};
         let response_body = client
-            .execute_query::<_, FooterQuery, _>(variables)
+            .execute_query::<_, WeptSettingsQuery, _>(variables)
             .await
             .map_err(|e: String| anyhow::anyhow!(e))?;
 
         let response_data = response_body;
         Ok(response_data)
-    }
-}
-
-impl Default for SettingsController {
-    fn default() -> Self {
-        Self::new()
     }
 }

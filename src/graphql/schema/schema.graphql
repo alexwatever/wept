@@ -21140,9 +21140,9 @@ type Page implements Node & ContentNode & UniformResourceIdentifiable & Database
   uri: String
 
   """
-  CUSTOM: Wept ACF Fields for the Footer Settings
+  CUSTOM: Wept ACF Fields for the Wept Settings
   """
-  weptFooter: WeptFooter
+  weptSettings: WeptSettings
 }
 
 """
@@ -58564,8 +58564,8 @@ type WritingSettings {
   useSmilies: Boolean
 }
 
-"""CUSTOM: Wept ACF Fields for the Footer Settings"""
-type WeptFooter {
+"""CUSTOM: ACF Fields for the Wept Settings"""
+type WeptSettings {
   copyright: String
   email: String
   facebook: String

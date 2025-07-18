@@ -1,3 +1,6 @@
+use dioxus::prelude::*;
+
+// Modules
 use crate::{
     controllers::settings::SettingsController,
     views::{
@@ -5,14 +8,15 @@ use crate::{
         icons::{Facebook, Instagram},
     },
 };
-use dioxus::prelude::*;
 
+/// Footer component
 #[component]
 pub fn Footer() -> Element {
-    let settings_controller = SettingsController::new();
-    let footer_settings = use_resource(move || {
-        let settings_controller = settings_controller.clone();
-        async move { settings_controller.get_footer_settings().await }
+    // Get settings data
+    let settings = SettingsController::new();
+    let settings = use_resource(move || {
+        let settings = settings.clone();
+        async move { settings.get().await }
     });
 
     rsx! {
@@ -20,9 +24,9 @@ pub fn Footer() -> Element {
             class: "bg-gray-800 text-white p-8",
             div {
                 class: "container mx-auto",
-                match &*footer_settings.value().read_unchecked() {
+                match &*settings.value().read_unchecked() {
                     Some(Ok(Some(data))) => {
-                        let settings = data.page.as_ref().and_then(|p| p.wept_footer.as_ref());
+                        let settings = data.page.as_ref().and_then(|p| p.wept_settings.as_ref());
                         if let Some(settings) = settings {
                             rsx! {
                                 div {
