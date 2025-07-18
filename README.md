@@ -20,8 +20,10 @@ This list is a work in progress. Features are implemented based on what I feel l
     - [x] Create the Posts page routing and components
     - [x] Create the Page page routing and components
     - [x] Create the Pages page routing and components
+    - [ ] Create components:
+        - [x] Footer
+        - [ ] Menu
     - [ ] Create Contact page routing and components
-    - [ ] Create Navigation components (header, footer, menu, etc.)
     - [ ] Create Search queries, routing, and components
         - [ ] Implement Pagination for search results
 - [ ] Integrations:

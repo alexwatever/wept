@@ -1,10 +1,14 @@
 query WeptSettingsQuery {
   page(id: "wept-settings", idType: URI) {
     weptSettings {
-      copyright
       email
+      phone
+      address
+      copyright
       facebook
       instagram
+      google_ads_id
+      google_analytics_id
     }
   }
 } 
