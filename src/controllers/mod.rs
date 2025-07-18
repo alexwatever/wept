@@ -1,5 +1,6 @@
 pub mod category;
-pub mod common;
+pub mod entity;
+pub mod navigation;
 pub mod page;
 pub mod post;
 pub mod product;

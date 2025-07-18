@@ -1,0 +1,12 @@
+query NavigationQuery($id: ID!) {
+  menu(id: $id, idType: NAME) {
+    menuItems {
+      nodes {
+        id
+        label
+        url
+        path
+      }
+    }
+  }
+} 

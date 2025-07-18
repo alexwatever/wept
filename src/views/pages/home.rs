@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use crate::{
     app::error::AppError,
     controllers::{
-        category::CategoryController, common::EntityController, page::PageController,
+        category::CategoryController, entity::EntityController, page::PageController,
         post::PostController, product::ProductController,
     },
     models::{category::ProductCategories, page::Pages, post::Posts, product::Products},

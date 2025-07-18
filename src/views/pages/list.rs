@@ -2,7 +2,7 @@ use dioxus::{hooks::UseResourceState, prelude::*};
 
 // Modules
 use crate::{
-    controllers::{common::EntityController, page::PageController},
+    controllers::{entity::EntityController, page::PageController},
     models::{page::Page, pagination::Pagination},
     views::components::page::page_card::PageCard,
 };

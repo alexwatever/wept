@@ -3,7 +3,7 @@ use dioxus::{hooks::UseResourceState, prelude::*};
 // Modules
 use crate::{
     controllers::{
-        category::CategoryController, common::EntityController, product::ProductController,
+        category::CategoryController, entity::EntityController, product::ProductController,
     },
     models::{category::ProductCategory, pagination::Pagination, product::Product},
     views::components::{

@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 // Modules
 use crate::{
     app::error::AppError,
-    controllers::{common::EntityController, page::PageController},
+    controllers::{entity::EntityController, page::PageController},
     models::page::Page,
     views::components::common::loader::LoaderComponent,
 };

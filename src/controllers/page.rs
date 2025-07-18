@@ -3,7 +3,7 @@ use async_trait::async_trait;
 // Modules
 use crate::{
     app::error::{AppError, AppErrorKind, GraphQLErrorWrapper},
-    controllers::common::EntityController,
+    controllers::entity::EntityController,
     graphql::{
         client::GraphQLClient,
         models::page::{page_query, pages_query, PageQuery, PagesQuery},
