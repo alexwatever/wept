@@ -21,6 +21,7 @@ use crate::{
                 ProductsQueryProductsNodesGalleryImagesNodes, ProductsQueryProductsNodesImage,
                 ProductsQueryProductsNodesOn, ProductsQueryProductsPageInfo,
             },
+            search_products_query,
         },
     },
     models::pagination::Pagination,
@@ -28,7 +29,7 @@ use crate::{
 };
 
 /// Product entity representing a WooCommerce product
-#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug, Default)]
 pub struct Product {
     /// Product ID
     pub id: String,
@@ -175,6 +176,21 @@ impl From<ProductsQueryProducts> for Products {
     }
 }
 
+impl From<search_products_query::SearchProductsQueryProducts> for Products {
+    fn from(products: search_products_query::SearchProductsQueryProducts) -> Self {
+        let products: Vec<Product> = products
+            .edges
+            .into_iter()
+            .map(|edge| Product::from(edge.node))
+            .collect();
+
+        Self {
+            products,
+            page_info: None, // Search does not have pagination
+        }
+    }
+}
+
 impl From<ProductsQueryProductsPageInfo> for Pagination {
     /// Convert a ProductsQueryProductsPageInfo to a Pagination
     ///
@@ -194,7 +210,7 @@ impl From<ProductsQueryProductsPageInfo> for Pagination {
 }
 
 /// Simple product data
-#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug, Default)]
 pub struct SimpleProduct {
     /// Whether the product is on sale
     pub on_sale: Option<bool>,
@@ -471,6 +487,40 @@ impl From<ProductCategoryGraphqlProductNode> for Product {
             date_on_sale_to: None,
             gallery_images: None,
             simple_product,
+        }
+    }
+}
+
+impl From<search_products_query::SearchProductsQueryProductsEdgesNode> for Product {
+    fn from(node: search_products_query::SearchProductsQueryProductsEdgesNode) -> Self {
+        let image = node.image.map(|img| ProductImage {
+            id: Some(img.id),
+            source_url: img.source_url,
+            alt_text: img.alt_text,
+            title: None,
+        });
+
+        let simple_product =
+            if let search_products_query::SearchProductsQueryProductsEdgesNodeOn::SimpleProduct(
+                sp,
+            ) = node.on
+            {
+                Some(SimpleProduct {
+                    price: sp.price,
+                    regular_price: sp.regular_price,
+                    ..Default::default()
+                })
+            } else {
+                None
+            };
+
+        Self {
+            id: node.id,
+            name: node.name,
+            slug: node.slug,
+            image,
+            simple_product,
+            ..Default::default()
         }
     }
 }

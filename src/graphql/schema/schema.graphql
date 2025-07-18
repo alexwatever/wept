@@ -58572,6 +58572,6 @@ type WeptSettings {
   copyright: String
   facebook: String
   instagram: String
-  google_ads_id: String
-  google_analytics_id: String
+  googleAdsId: String
+  googleAnalyticsId: String
 }

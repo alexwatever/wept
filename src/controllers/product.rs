@@ -6,13 +6,16 @@ use crate::{
     controllers::common::EntityController,
     graphql::{
         client::GraphQLClient,
-        models::product::{product_query, products_query, ProductQuery, ProductsQuery},
+        models::product::{
+            product_query, products_query, search_products_query, ProductQuery, ProductsQuery,
+            SearchProductsQuery,
+        },
     },
     models::product::{Product, Products},
 };
 
 /// Product controller
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ProductController {
     /// The GraphQL client used for API communication
     client: GraphQLClient,
@@ -24,6 +27,39 @@ impl ProductController {
         Self {
             client: GraphQLClient::new(),
         }
+    }
+
+    /// Search for products by a given search term.
+    pub async fn search_products(&self, search_term: &str) -> Result<Products, AppError> {
+        let variables = search_products_query::Variables {
+            search: search_term.to_string(),
+        };
+
+        let response_body = self
+            .client
+            .execute_query::<_, SearchProductsQuery, search_products_query::ResponseData>(variables)
+            .await
+            .map_err(|err| {
+                AppError::new_with_source(
+                    AppErrorKind::GraphQL,
+                    "An error occurred while searching for products.".to_string(),
+                    Some(format!(
+                        "Failed to execute search_products query for term '{search_term}'"
+                    )),
+                    GraphQLErrorWrapper(err),
+                )
+            })?;
+
+        let products = response_body.products.map(Products::from).ok_or_else(|| {
+            AppError::new(
+                AppErrorKind::NotFound,
+                "No products found matching the search term.".to_string(),
+                Some(format!("No products found for search term '{search_term}'")),
+                None,
+            )
+        })?;
+
+        Ok(products)
     }
 }
 

@@ -19,3 +19,12 @@ pub struct ProductQuery;
     enums_derive = "Debug, Clone"
 )]
 pub struct ProductsQuery;
+
+/// Search Products GraphQL Query
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/graphql/schema/schema.graphql",
+    query_path = "src/graphql/schema/product/search_products_query.graphql",
+    response_derives = "Debug, PartialEq, Clone, Serialize, Deserialize"
+)]
+pub struct SearchProductsQuery;

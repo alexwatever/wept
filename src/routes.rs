@@ -6,7 +6,7 @@ use crate::views::{
     pages::{
         categories::CategoriesPage, category::CategoryPage, errors::NotFoundPage, home::HomePage,
         list::PagesListPage, page::PagePage, post::PostPage, posts::PostsPage,
-        product::ProductPage,
+        product::ProductPage, search::SearchPage,
     },
 };
 
@@ -49,7 +49,11 @@ pub enum Routes {
     #[route("/posts")]
     PostsPage {},
 
+    /// Route for the Search page.
+    #[route("/search/:query")]
+    SearchPage { query: String },
+
     /// Catch-all route (404).
     #[route("/:..route")]
-    NotFoundPage { route: Vec<String>, message: Option<String> },
+    NotFoundPage { route: Vec<String> },
 }

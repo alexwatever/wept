@@ -1,7 +1,8 @@
 use dioxus::prelude::*;
+use dioxus_router::prelude::Link;
 
 // Modules
-use crate::routes::Routes;
+use crate::{routes::Routes, views::components::search::search_bar::SearchBar};
 
 /// Navigation component
 #[component]
@@ -39,11 +40,8 @@ pub fn Nav() -> Element {
                     }
 
                     // Search
-                    div { class: "hidden xl:inline-block mr-14",
-                        input { class: "py-5 px-8 w-full placeholder-gray-400 text-xs uppercase font-semibold font-heading bg-gray-50 border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md",
-                            placeholder: "Search",
-                            r#type: "text",
-                        }
+                    div { class: "hidden xl:inline-block w-full max-w-xs mr-14",
+                        SearchBar {}
                     }
                 }
             }

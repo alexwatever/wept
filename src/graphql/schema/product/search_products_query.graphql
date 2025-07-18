@@ -1,0 +1,22 @@
+query SearchProductsQuery($search: String!) {
+  products(where: {search: $search}) {
+    edges {
+      node {
+        __typename
+        id
+        databaseId
+        name
+        slug
+        ... on SimpleProduct {
+          price
+          regularPrice
+        }
+        image {
+          id
+          sourceUrl
+          altText
+        }
+      }
+    }
+  }
+} 

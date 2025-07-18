@@ -7,8 +7,8 @@ query WeptSettingsQuery {
       copyright
       facebook
       instagram
-      google_ads_id
-      google_analytics_id
+      googleAdsId
+      googleAnalyticsId
     }
   }
 } 
