@@ -20,12 +20,14 @@ This list is a work in progress. Features are implemented based on what I feel l
     - [x] Create the Posts page routing and components
     - [x] Create the Page page routing and components
     - [x] Create the Pages page routing and components
+    - [x] Create the Search page routing and components
     - [ ] Create components:
         - [x] Footer
         - [ ] Menu
-    - [ ] Create Contact page routing and components
-    - [ ] Create Search queries, routing, and components
-        - [ ] Implement Pagination for search results
+        - [ ] Pagination
+    - [ ] Create the Contact page routing and components
+    - [ ] Create the Gallery page routing and components
+    - [ ] Create the Get Quote functionality
 - [ ] Integrations:
     - [ ] Contact Form 7 via REST API, or Ninja Forms via GraphQL
     - [ ] Google Analytics 4

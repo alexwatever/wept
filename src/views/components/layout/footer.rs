@@ -5,7 +5,7 @@ use crate::{
     controllers::settings::SettingsController,
     views::{
         components::common::loader::LoaderComponent,
-        icons::{Facebook, Instagram},
+        icons::{Facebook, Instagram, Twitter},
     },
 };
 
@@ -41,6 +41,14 @@ pub fn Footer() -> Element {
                                                 a { href: "mailto:{email}", class: "hover:underline", "{email}" }
                                             }
                                         }
+                                        if let Some(phone) = &settings.phone {
+                                            p { class: "text-sm",
+                                                a { href: "tel:{phone}", class: "hover:underline", "{phone}" }
+                                            }
+                                        }
+                                        if let Some(address) = &settings.address {
+                                            p { class: "text-sm", "{address}" }
+                                        }
                                     }
                                     div {
                                         class: "flex space-x-4",
@@ -52,6 +60,11 @@ pub fn Footer() -> Element {
                                         if let Some(instagram) = &settings.instagram {
                                             if !instagram.is_empty() {
                                                 a { href: "{instagram}", target: "_blank", rel: "noopener noreferrer", class: "hover:text-gray-400", Instagram {} }
+                                            }
+                                        }
+                                        if let Some(twitter) = &settings.twitter {
+                                            if !twitter.is_empty() {
+                                                a { href: "{twitter}", target: "_blank", rel: "noopener noreferrer", class: "hover:text-gray-400", Twitter {} }
                                             }
                                         }
                                     }

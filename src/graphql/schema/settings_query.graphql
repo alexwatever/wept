@@ -7,8 +7,10 @@ query WeptSettingsQuery {
       copyright
       facebook
       instagram
+      twitter
       googleAdsId
       googleAnalyticsId
+      googlePlaceId
     }
   }
 } 
