@@ -8,15 +8,17 @@ use crate::{
 /// Search page component
 #[component]
 pub fn SearchPage(query: String) -> Element {
-    // Initialize the product controller
-    let product_controller = ProductController::new();
+    // When the `query` prop changes, update the signal
+    let mut query_signal = use_signal(|| query.clone());
+    if *query_signal.read() != query {
+        query_signal.set(query.clone());
+    }
 
     // Initialize the search results resource
-    let query_for_async = query.clone();
+    let search_results = ProductController::new();
     let search_results = use_resource(move || {
-        let product_controller = product_controller.clone();
-        let query = query_for_async.clone();
-        async move { product_controller.search_products(&query).await }
+        let search_results = search_results.clone();
+        async move { search_results.search_products(&query_signal.read()).await }
     });
 
     rsx! {
