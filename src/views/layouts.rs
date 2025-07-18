@@ -1,19 +1,34 @@
 use dioxus::prelude::*;
 
 // Modules
-use crate::routes::Routes;
-use crate::views::components::{common::loader::ChildrenOrLoading, layout::nav::Nav};
+use crate::{
+    routes::Routes,
+    views::components::{
+        common::loader::ChildrenOrLoading,
+        layout::{footer::Footer, nav::Nav},
+    },
+};
 
 /// Main layout component
 #[component]
 pub fn MainLayout() -> Element {
     rsx! {
-        // Navigation component
-        Nav {}
+        div {
+            class: "flex flex-col min-h-screen",
 
-        // Outlet for the routes
-        ChildrenOrLoading {
-            Outlet::<Routes> {}
+            // Navigation component
+            Nav {}
+
+            // Main content
+            main {
+                class: "flex-grow",
+                ChildrenOrLoading {
+                    Outlet::<Routes> {}
+                }
+            }
+
+            // Footer component
+            Footer {}
         }
     }
 }

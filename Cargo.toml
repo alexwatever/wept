@@ -9,6 +9,7 @@ authors = ["Alex Watson <alex@coded.cc>"]
 license = "MPL-2.0"
 
 [dependencies]
+anyhow = { version = "1.0.86" }
 async-trait = "0.1.88"
 chrono = { version = "0.4", features = ["serde"] }
 dioxus = { version = "0.6.3", features = ["web", "router"] }

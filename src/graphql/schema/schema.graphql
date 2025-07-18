@@ -21138,6 +21138,11 @@ type Page implements Node & ContentNode & UniformResourceIdentifiable & Database
   The unique resource identifier path
   """
   uri: String
+
+  """
+  CUSTOM: Wept ACF Fields for the Footer Settings
+  """
+  weptFooter: WeptFooter
 }
 
 """
@@ -58557,4 +58562,12 @@ type WritingSettings {
   Convert emoticons like :-) and :-P to graphics on display.
   """
   useSmilies: Boolean
+}
+
+"""CUSTOM: Wept ACF Fields for the Footer Settings"""
+type WeptFooter {
+  copyright: String
+  email: String
+  facebook: String
+  instagram: String
 }

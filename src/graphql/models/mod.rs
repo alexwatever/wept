@@ -1,7 +1,5 @@
-/// # GraphQL Models Module
-///
-/// This module is responsible for all GraphQL-related model mapping
 pub mod category;
+pub mod footer;
 pub mod page;
 pub mod post;
 pub mod product;

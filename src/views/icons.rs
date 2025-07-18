@@ -40,3 +40,37 @@ pub fn _hamburger_menu() -> Element {
         }
     }
 }
+
+#[component]
+pub fn Facebook() -> Element {
+    rsx! {
+        svg {
+            class: "w-6 h-6",
+            "aria-hidden": "true",
+            xmlns: "http://www.w3.org/2000/svg",
+            fill: "currentColor",
+            view_box: "0 0 8 19",
+            path {
+                "fill-rule": "evenodd",
+                d: "M6.135 3H8V0H6.135a4.147 4.147 0 0 0-4.142 4.142V6H0v3h2v9.938h3V9h2.021l.592-3H5V3.591A.6.6 0 0 1 5.592 3h.543Z",
+                "clip-rule": "evenodd"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn Instagram() -> Element {
+    rsx! {
+        svg {
+            class: "w-6 h-6",
+            "aria-hidden": "true",
+            xmlns: "http://www.w3.org/2000/svg",
+            fill: "currentColor",
+            view_box: "0 0 24 24",
+            path {
+                d: "M13.795 10.533 20.68 2h-3.073l-5.255 6.517L6.952 2H2l7.304 10.513L2 22h3.074l5.643-6.905L16.471 22h4.952l-7.628-11.467Zm-2.38 2.95L9.94 11.432l-1.42-2.025 5.344-7.65h2.38l-5.324 7.632 1.53 2.186 1.42 2.025-5.556 8.01h-2.38l5.536-7.986Z"
+            }
+        }
+    }
+}

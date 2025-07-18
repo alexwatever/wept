@@ -1,0 +1,10 @@
+query FooterQuery {
+  page(id: "wept-footer", idType: URI) {
+    weptFooter {
+      copyright
+      email
+      facebook
+      instagram
+    }
+  }
+} 
