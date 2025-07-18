@@ -3,7 +3,6 @@ use dioxus_router::prelude::Link;
 
 use crate::{
     controllers::navigation::NavigationController,
-    routes::Routes,
     views::components::{common::loader::LoaderComponent, search::search_bar::SearchBar},
 };
 
@@ -32,13 +31,13 @@ pub fn Nav() -> Element {
                                     if let Some(nodes) = &menu.menu_items {
                                         rsx! {
                                             for item in &nodes.nodes {
-                                                if let Some(item_path) = item.path.as_ref() {
+                                                if let Some(path) = &item.path {
                                                     li {
                                                         class: "mr-12",
                                                         Link {
                                                             class: "hover:text-gray-600",
-                                                            to: Routes::from_path(item_path),
-                                                            "{item.label.as_ref().unwrap_or(&\"\".to_string())}"
+                                                            to: "{path}",
+                                                            "{item.label.as_ref().unwrap_or(&String::new())}"
                                                         }
                                                     }
                                                 }
