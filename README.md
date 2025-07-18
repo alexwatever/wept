@@ -29,6 +29,7 @@ This list is a work in progress. Features are implemented based on what I feel l
     - [ ] Create the Gallery page routing and components
     - [ ] Create the Get Quote functionality
 - [ ] Integrations:
+    - [ ] SCSS
     - [ ] Contact Form 7 via REST API, or Ninja Forms via GraphQL
     - [ ] Google Analytics 4
     - [ ] Schema.org

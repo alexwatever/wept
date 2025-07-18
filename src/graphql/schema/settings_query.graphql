@@ -1,6 +1,15 @@
 query WeptSettingsQuery {
   page(id: "wept-settings", idType: URI) {
     weptSettings {
+      siteName
+      siteLogo {
+        altText
+        sourceUrl
+        mediaDetails {
+          height
+          width
+        }
+      }
       email
       phone
       address

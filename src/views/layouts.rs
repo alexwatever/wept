@@ -5,7 +5,7 @@ use crate::{
     routes::Routes,
     views::components::{
         common::loader::ChildrenOrLoading,
-        layout::{footer::Footer, nav::Nav},
+        layout::{footer::Footer, header::Header},
     },
 };
 
@@ -16,8 +16,8 @@ pub fn MainLayout() -> Element {
         div {
             class: "flex flex-col min-h-screen",
 
-            // Navigation component
-            Nav {}
+            // Header component
+            Header {}
 
             // Main content
             main {

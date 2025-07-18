@@ -58566,6 +58566,8 @@ type WritingSettings {
 
 """CUSTOM: ACF Fields for the Wept Settings"""
 type WeptSettings {
+  siteName: String
+  siteLogo: MediaItem
   email: String
   phone: String
   address: String
