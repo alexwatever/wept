@@ -34,10 +34,7 @@ impl State {
     ///
     /// Create a default state instance.
     pub fn default() -> Self {
-        let cart = match LocalStorage::get("cart") {
-            Ok(cart) => cart,
-            Err(_) => Cart::default(),
-        };
+        let cart = LocalStorage::get("cart").unwrap_or_default();
 
         Self {
             backend_host: Env::backend_host_default(),

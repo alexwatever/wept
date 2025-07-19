@@ -51,7 +51,7 @@ impl GraphQLClient {
     }
 
     /// Execute a GraphQL mutation
-    pub async fn execute_mutation<V, Q, R>(&self, variables: V) -> Result<reqwest::Response, String>
+    pub async fn execute_mutation<V, Q>(&self, variables: V) -> Result<reqwest::Response, String>
     where
         V: Serialize,
         Q: GraphQLQuery<Variables = V>,

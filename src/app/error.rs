@@ -34,7 +34,7 @@ pub enum AppErrorKind {
     /// Errors related to data not being found.
     NotFound,
     /// Errors during data parsing or transformation.
-    _Parse,
+    Parse,
 }
 
 impl Display for AppErrorKind {
@@ -44,7 +44,7 @@ impl Display for AppErrorKind {
             AppErrorKind::General => write!(f, "General Error"),
             AppErrorKind::GraphQL => write!(f, "GraphQL Error"),
             AppErrorKind::NotFound => write!(f, "Not Found Error"),
-            AppErrorKind::_Parse => write!(f, "_Parse Error"),
+            AppErrorKind::Parse => write!(f, "Parse Error"),
         }
     }
 }

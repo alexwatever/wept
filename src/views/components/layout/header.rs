@@ -3,10 +3,7 @@ use dioxus::prelude::*;
 // Modules
 use crate::{
     controllers::settings::SettingsController,
-    views::{
-        components::{common::loader::LoaderComponent, layout::nav::Nav},
-        icons::CartIcon,
-    },
+    views::components::{cart::icon::CartIcon, common::loader::LoaderComponent, layout::nav::Nav},
 };
 
 /// Header component

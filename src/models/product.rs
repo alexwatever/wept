@@ -64,10 +64,80 @@ pub struct Product {
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub enum ProductSimpleProduct {
-    SimpleProduct(SimpleProduct),
-    SimpleProductFromProductsQuery(ProductsQueryProductsNodesOnSimpleProduct),
-    SimpleProductFromProductQuery(ProductQueryProductOnSimpleProduct),
-    SimpleProductFromSearchProductsQuery(SearchProductsQueryProductsEdgesNodeOnSimpleProduct),
+    Product(SimpleProduct),
+    FromProductsQuery(ProductsQueryProductsNodesOnSimpleProduct),
+    FromProductQuery(ProductQueryProductOnSimpleProduct),
+    FromSearchProductsQuery(SearchProductsQueryProductsEdgesNodeOnSimpleProduct),
+}
+
+impl ProductSimpleProduct {
+    pub fn price(&self) -> Option<String> {
+        match self {
+            ProductSimpleProduct::Product(sp) => {
+                if sp.on_sale.unwrap_or(false) {
+                    if let (Some(regular_price), Some(sale_price)) =
+                        (sp.regular_price.as_ref(), sp.sale_price.as_ref())
+                    {
+                        Some(format!("{} (Sale: {})", regular_price, sale_price))
+                    } else {
+                        None
+                    }
+                } else {
+                    sp.price.clone()
+                }
+            }
+            ProductSimpleProduct::FromProductsQuery(sp) => sp.price.clone(),
+            ProductSimpleProduct::FromProductQuery(sp) => sp.price.clone(),
+            ProductSimpleProduct::FromSearchProductsQuery(sp) => sp.price.clone(),
+        }
+    }
+
+    pub fn stock_info(&self) -> String {
+        match self {
+            ProductSimpleProduct::Product(sp) => {
+                match (sp.stock_status.as_deref(), sp.stock_quantity) {
+                    (Some("IN_STOCK"), Some(qty)) if qty > 0 => {
+                        format!("In Stock ({} available)", qty)
+                    }
+                    (Some("IN_STOCK"), _) => "In Stock".to_string(),
+                    (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
+                    (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
+                    _ => "Status Unknown".to_string(),
+                }
+            }
+            ProductSimpleProduct::FromProductsQuery(sp) => {
+                format!("{:?}", sp.stock_status)
+            }
+            ProductSimpleProduct::FromProductQuery(sp) => {
+                format!("{:?}", sp.stock_status)
+            }
+            ProductSimpleProduct::FromSearchProductsQuery(sp) => {
+                format!("{:?}", sp.stock_status)
+            }
+        }
+    }
+
+    pub fn is_in_stock(&self) -> bool {
+        match self {
+            ProductSimpleProduct::Product(sp) => {
+                sp.stock_status.as_ref() == Some(&"IN_STOCK".to_string())
+            }
+            ProductSimpleProduct::FromProductsQuery(sp) => {
+                sp.stock_status
+                    == Some(crate::graphql::models::product::products_query::StockStatusEnum::IN_STOCK)
+            }
+            ProductSimpleProduct::FromProductQuery(sp) => {
+                sp.stock_status
+                    == Some(crate::graphql::models::product::product_query::StockStatusEnum::IN_STOCK)
+            }
+            ProductSimpleProduct::FromSearchProductsQuery(sp) => {
+                sp.stock_status
+                    == Some(
+                        crate::graphql::models::product::search_products_query::StockStatusEnum::IN_STOCK,
+                    )
+            }
+        }
+    }
 }
 
 impl From<ProductQueryProduct> for Product {
@@ -100,8 +170,7 @@ impl From<ProductQueryProduct> for Product {
             featured_image_id,
             image,
             gallery_images,
-            simple_product: simple_product_data
-                .map(|sp| ProductSimpleProduct::SimpleProductFromProductQuery(sp)),
+            simple_product: simple_product_data.map(ProductSimpleProduct::FromProductQuery),
         }
     }
 }
@@ -362,8 +431,7 @@ impl From<ProductsQueryProductsNodes> for Product {
             featured_image_id,
             image,
             gallery_images,
-            simple_product: simple_product_data
-                .map(|sp| ProductSimpleProduct::SimpleProductFromProductsQuery(sp)),
+            simple_product: simple_product_data.map(ProductSimpleProduct::FromProductsQuery),
         }
     }
 }
@@ -423,7 +491,7 @@ impl From<ProductCategoryGraphqlProductNode> for Product {
             date_on_sale_from: None,
             date_on_sale_to: None,
             gallery_images: None,
-            simple_product: simple_product.map(ProductSimpleProduct::SimpleProduct),
+            simple_product: simple_product.map(ProductSimpleProduct::Product),
             database_id: None,
         }
     }
@@ -454,8 +522,7 @@ impl From<search_products_query::SearchProductsQueryProductsEdgesNode> for Produ
             name: product.name,
             image,
             featured_image_id,
-            simple_product: simple_product_data
-                .map(|sp| ProductSimpleProduct::SimpleProductFromSearchProductsQuery(sp)),
+            simple_product: simple_product_data.map(ProductSimpleProduct::FromSearchProductsQuery),
             ..Default::default()
         }
     }

@@ -1,12 +1,17 @@
 use dioxus::prelude::*;
-use gloo_storage::{LocalStorage, Storage};
 
 // Modules
 use crate::{
-    app::{error::AppError, state::STATE},
-    controllers::{cart::CartController, entity::EntityController, product::ProductController},
-    models::product::{Product, ProductImage, ProductSimpleProduct},
-    views::{components::common::loader::LoaderComponent, pages::errors::NotFoundPage},
+    app::error::AppError,
+    controllers::{entity::EntityController, product::ProductController},
+    models::product::Product,
+    views::components::{
+        common::loader::LoaderComponent,
+        product::{
+            add_to_cart_form::AddToCartForm, details::ProductDetails,
+            image_gallery::ProductImageGallery,
+        },
+    },
 };
 
 /// Product page component
@@ -26,236 +31,13 @@ pub fn ProductPage(product_slug: String) -> Element {
     let rendered = match &*product_resource.read() {
         Some(Ok(product)) => {
             let product = product.clone();
-            // Get Product values
-            let Product {
-                sku,
-                name,
-                short_description,
-                image,
-                gallery_images,
-                simple_product,
-                ..
-            } = product;
-
-            // Get SimpleProduct values
-            let simple_product = match simple_product {
-                Some(simple_product) => simple_product,
-                None => {
-                    return rsx! {
-                        NotFoundPage { route: vec!["product".to_string(), product_slug], message: Some("Simple product data not found".to_string()) }
-                    };
-                }
-            };
-
-            // Product name
-            let name: String = name.clone().unwrap_or_default();
-
-            // Product image
-            let image: Option<String> = image
-                .as_ref()
-                .and_then(|img: &ProductImage| img.source_url.clone());
-
-            // Produce price
-            let price: Option<String> = match &simple_product {
-                ProductSimpleProduct::SimpleProduct(sp) => {
-                    if sp.on_sale.unwrap_or(false) {
-                        if let (Some(regular_price), Some(sale_price)) =
-                            (sp.regular_price.as_ref(), sp.sale_price.as_ref())
-                        {
-                            Some(format!("{} (Sale: {})", regular_price, sale_price))
-                        } else {
-                            None
-                        }
-                    } else {
-                        sp.price.clone()
-                    }
-                }
-                ProductSimpleProduct::SimpleProductFromProductsQuery(sp) => sp.price.clone(),
-                ProductSimpleProduct::SimpleProductFromProductQuery(sp) => sp.price.clone(),
-                ProductSimpleProduct::SimpleProductFromSearchProductsQuery(sp) => sp.price.clone(),
-            };
-
-            // Product stock status
-            let stock_info: String = match &simple_product {
-                ProductSimpleProduct::SimpleProduct(sp) => {
-                    match (
-                        sp.stock_status.as_ref().map(|s| s.as_str()),
-                        sp.stock_quantity,
-                    ) {
-                        (Some("IN_STOCK"), Some(qty)) if qty > 0 => {
-                            format!("In Stock ({} available)", qty)
-                        }
-                        (Some("IN_STOCK"), _) => "In Stock".to_string(),
-                        (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
-                        (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
-                        _ => "Status Unknown".to_string(),
-                    }
-                }
-                ProductSimpleProduct::SimpleProductFromProductsQuery(sp) => {
-                    format!("{:?}", sp.stock_status)
-                }
-                ProductSimpleProduct::SimpleProductFromProductQuery(sp) => {
-                    format!("{:?}", sp.stock_status)
-                }
-                ProductSimpleProduct::SimpleProductFromSearchProductsQuery(sp) => {
-                    format!("{:?}", sp.stock_status)
-                }
-            };
-
-            // Render page
             rsx! {
                 section { class: "py-20",
                     div { class: "container mx-auto px-4",
                         div { class: "flex flex-wrap -mx-4 mb-24",
-                            div { class: "w-full md:w-1/2 px-4 mb-8 md:mb-0",
-                                div { class: "relative mb-10", style: "height: 564px;",
-                                    // Image
-                                    if let Some(image) = image {
-                                        img {
-                                            class: "object-cover w-full h-full",
-                                            alt: "{name.clone()}",
-                                            src: "{image}",
-                                        }
-                                    }
-                                }
-
-                                // Gallery thumbnails
-                                if let Some(gallery) = gallery_images.as_ref() {
-                                    div { class: "flex -mx-2",
-                                        for img in gallery.iter().take(4) {
-                                            if let Some(source_url) = img.source_url.as_ref() {
-                                                div { class: "w-1/4 px-2",
-                                                    img {
-                                                        class: "w-full h-24 object-cover rounded",
-                                                        src: "{source_url}",
-                                                        alt: "{img.alt_text.as_ref().map(|text| text.clone()).unwrap_or_default()}"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            div { class: "w-full md:w-1/2 px-4",
-                                div { class: "lg:pl-20",
-                                    div { class: "mb-10 pb-10 border-b",
-                                        // Product name
-                                        h2 { class: "mt-2 mb-6 max-w-xl text-5xl md:text-6xl font-bold font-heading",
-                                            "{name}"
-                                        }
-
-                                        // Price
-                                        if let Some(price) = price {
-                                            p { class: "inline-block mb-4 text-2xl font-bold font-heading text-blue-500",
-                                                "{price}"
-                                            }
-                                        }
-
-                                        // Stock status
-                                        p { class: "mb-8 text-sm",
-                                            span {
-                                                class: if match &simple_product {
-                                                    ProductSimpleProduct::SimpleProduct(sp) => {
-                                                        sp.stock_status.as_ref()
-                                                            == Some(&"IN_STOCK".to_string())
-                                                    }
-                                                    ProductSimpleProduct::SimpleProductFromProductsQuery(
-                                                        sp,
-                                                    ) => {
-                                                        sp.stock_status
-                                                            == Some(
-                                                                crate::graphql::models::product::products_query::StockStatusEnum::IN_STOCK,
-                                                            )
-                                                    }
-                                                    ProductSimpleProduct::SimpleProductFromProductQuery(
-                                                        sp,
-                                                    ) => {
-                                                        sp.stock_status
-                                                            == Some(
-                                                                crate::graphql::models::product::product_query::StockStatusEnum::IN_STOCK,
-                                                            )
-                                                    }
-                                                    ProductSimpleProduct::SimpleProductFromSearchProductsQuery(
-                                                        sp,
-                                                    ) => {
-                                                        sp.stock_status
-                                                            == Some(
-                                                                crate::graphql::models::product::search_products_query::StockStatusEnum::IN_STOCK,
-                                                            )
-                                                    }
-                                                } {
-                                                    "text-green-600 font-semibold"
-                                                } else {
-                                                    "text-red-600 font-semibold"
-                                                },
-                                                "{stock_info}"
-                                            }
-                                        }
-
-                                        // Short description
-                                        if let Some(short_desc) = short_description.as_ref() {
-                                            p { class: "max-w-md mb-8 text-gray-500",
-                                                "{short_desc}"
-                                            }
-                                        }
-
-                                        // SKU
-                                        if let Some(sku) = sku.as_ref() {
-                                            p { class: "text-sm text-gray-400",
-                                                "SKU: {sku}"
-                                            }
-                                        }
-                                    }
-
-                                    // Add to cart
-                                    div { class: "flex flex-wrap -mx-4 mb-14 items-center",
-                                        div { class: "w-full xl:w-2/3 px-4 mb-4 xl:mb-0",
-                                            button {
-                                                class: "block bg-orange-300 hover:bg-orange-400 text-center text-white font-bold font-heading py-5 px-8 rounded-md uppercase transition duration-200",
-                                                onclick: move |_| {
-                                                    if let Some(product_id) = product.database_id {
-                                                        let mut cart_controller = CartController::new();
-                                                        spawn(async move {
-                                                            match cart_controller.add_to_cart(product_id, 1).await {
-                                                                Ok(_) => {
-                                                                    // Refetch cart after adding an item
-                                                                    match cart_controller.get_cart().await {
-                                                                        Ok(Some(response_data)) => {
-                                                                            if let Some(cart) = response_data.cart {
-                                                                                let mut state = STATE.write();
-                                                                                if let Some(contents) = cart.contents {
-                                                                                    state.cart.items =
-                                                                                        contents.nodes.into_iter().collect();
-                                                                                }
-                                                                                state.cart.total = cart.total.unwrap_or_default();
-                                                                                state.cart.subtotal =
-                                                                                    cart.subtotal.unwrap_or_default();
-
-                                                                                // Save cart to local storage
-                                                                                if let Err(e) = LocalStorage::set("cart", state.cart.clone()) {
-                                                                                    tracing::error!("Failed to save cart to local storage: {}", e);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        Ok(None) => {}
-                                                                        Err(e) => {
-                                                                            tracing::error!("Error refetching cart: {}", e);
-                                                                        }
-                                                                    }
-                                                                }
-                                                                Err(e) => {
-                                                                    tracing::error!("Error adding to cart: {}", e);
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                },
-                                                "Add to cart"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            ProductImageGallery { product: product.clone() }
+                            ProductDetails { product: product.clone() }
+                            AddToCartForm { product: product.clone() }
                         }
                     }
                 }
