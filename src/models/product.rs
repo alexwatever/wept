@@ -19,9 +19,10 @@ use crate::{
                 ProductsQueryProducts, ProductsQueryProductsNodes,
                 ProductsQueryProductsNodesGalleryImages,
                 ProductsQueryProductsNodesGalleryImagesNodes, ProductsQueryProductsNodesImage,
-                ProductsQueryProductsNodesOn, ProductsQueryProductsPageInfo,
+                ProductsQueryProductsNodesOn, ProductsQueryProductsNodesOnSimpleProduct,
+                ProductsQueryProductsPageInfo,
             },
-            search_products_query,
+            search_products_query::{self, SearchProductsQueryProductsEdgesNodeOnSimpleProduct},
         },
     },
     models::pagination::Pagination,
@@ -56,9 +57,17 @@ pub struct Product {
     /// Product gallery images
     pub gallery_images: Option<Vec<ProductImage>>,
     /// Simple product data
-    pub simple_product: Option<ProductQueryProductOnSimpleProduct>,
+    pub simple_product: Option<ProductSimpleProduct>,
     /// Product database ID
     pub database_id: Option<i64>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+pub enum ProductSimpleProduct {
+    SimpleProduct(SimpleProduct),
+    SimpleProductFromProductsQuery(ProductsQueryProductsNodesOnSimpleProduct),
+    SimpleProductFromProductQuery(ProductQueryProductOnSimpleProduct),
+    SimpleProductFromSearchProductsQuery(SearchProductsQueryProductsEdgesNodeOnSimpleProduct),
 }
 
 impl From<ProductQueryProduct> for Product {
@@ -91,7 +100,8 @@ impl From<ProductQueryProduct> for Product {
             featured_image_id,
             image,
             gallery_images,
-            simple_product: simple_product_data,
+            simple_product: simple_product_data
+                .map(|sp| ProductSimpleProduct::SimpleProductFromProductQuery(sp)),
         }
     }
 }
@@ -352,7 +362,8 @@ impl From<ProductsQueryProductsNodes> for Product {
             featured_image_id,
             image,
             gallery_images,
-            simple_product: simple_product_data,
+            simple_product: simple_product_data
+                .map(|sp| ProductSimpleProduct::SimpleProductFromProductsQuery(sp)),
         }
     }
 }
@@ -412,7 +423,8 @@ impl From<ProductCategoryGraphqlProductNode> for Product {
             date_on_sale_from: None,
             date_on_sale_to: None,
             gallery_images: None,
-            simple_product,
+            simple_product: simple_product
+                .map(|sp| ProductSimpleProduct::SimpleProduct(SimpleProduct::from(sp))),
             database_id: None,
         }
     }
@@ -443,7 +455,8 @@ impl From<search_products_query::SearchProductsQueryProductsEdgesNode> for Produ
             name: product.name,
             image,
             featured_image_id,
-            simple_product: simple_product_data,
+            simple_product: simple_product_data
+                .map(|sp| ProductSimpleProduct::SimpleProductFromSearchProductsQuery(sp)),
             ..Default::default()
         }
     }

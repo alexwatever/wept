@@ -4,9 +4,8 @@ use dioxus::prelude::*;
 use crate::{
     app::{error::AppError, state::STATE},
     controllers::{cart::CartController, entity::EntityController, product::ProductController},
-    models::product::{Product, ProductImage, SimpleProduct},
-    views::components::common::loader::LoaderComponent,
-    views::pages::errors::NotFoundPage,
+    models::product::{Product, ProductImage, ProductSimpleProduct},
+    views::{components::common::loader::LoaderComponent, pages::errors::NotFoundPage},
 };
 
 /// Product page component
@@ -38,15 +37,7 @@ pub fn ProductPage(product_slug: String) -> Element {
             } = product;
 
             // Get SimpleProduct values
-            let SimpleProduct {
-                price,
-                sale_price,
-                regular_price,
-                on_sale,
-                stock_status,
-                stock_quantity,
-                ..
-            } = match simple_product {
+            let simple_product = match simple_product {
                 Some(simple_product) => simple_product,
                 None => {
                     return rsx! {
@@ -64,28 +55,43 @@ pub fn ProductPage(product_slug: String) -> Element {
                 .and_then(|img: &ProductImage| img.source_url.clone());
 
             // Produce price
-            let price: Option<String> = if on_sale.unwrap_or(false) {
-                if let (Some(regular_price), Some(sale_price)) =
-                    (regular_price.as_ref(), sale_price.as_ref())
-                {
-                    Some(format!("{} (Sale: {})", regular_price, sale_price))
+            let price: Option<String> =
+                if let ProductSimpleProduct::SimpleProduct(simple_product) = simple_product {
+                    if simple_product.on_sale.unwrap_or(false) {
+                        if let (Some(regular_price), Some(sale_price)) = (
+                            simple_product.regular_price.as_ref(),
+                            simple_product.sale_price.as_ref(),
+                        ) {
+                            Some(format!("{} (Sale: {})", regular_price, sale_price))
+                        } else {
+                            None
+                        }
+                    } else {
+                        simple_product.price.clone()
+                    }
                 } else {
                     None
-                }
-            } else {
-                price.clone()
-            };
+                };
 
             // Product stock status
             let stock_info: String =
-                match (stock_status.as_deref(), stock_quantity.as_ref().map(|q| *q)) {
-                    (Some("IN_STOCK"), Some(qty)) if qty > 0 => {
-                        format!("In Stock ({} available)", qty)
+                if let ProductSimpleProduct::SimpleProduct(simple_product) = &simple_product {
+                    match (
+                        simple_product.stock_status.as_ref().map(|s| s),
+                        simple_product.stock_quantity.as_ref().map(|q| *q),
+                    ) {
+                        (Some(label), Some(qty)) if qty > 0 && label == "IN_STOCK" => {
+                            format!("In Stock ({} available)", qty)
+                        }
+                        (Some(label), _) if label == "IN_STOCK" => "In Stock".to_string(),
+                        (Some(label), _) if label == "OUT_OF_STOCK" => "Out of Stock".to_string(),
+                        (Some(label), _) if label == "ON_BACKORDER" => {
+                            "Available on Backorder".to_string()
+                        }
+                        _ => "Status Unknown".to_string(),
                     }
-                    (Some("IN_STOCK"), _) => "In Stock".to_string(),
-                    (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
-                    (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
-                    _ => "Status Unknown".to_string(),
+                } else {
+                    "Status Unknown".to_string()
                 };
 
             // Render page
@@ -140,7 +146,11 @@ pub fn ProductPage(product_slug: String) -> Element {
                                         // Stock status
                                         p { class: "mb-8 text-sm",
                                             span {
-                                                class: if stock_status.as_deref() == Some("IN_STOCK") { "text-green-600 font-semibold" } else { "text-red-600 font-semibold" },
+                                                class: if let ProductSimpleProduct::SimpleProduct(simple_product) = &simple_product {
+                                                    if simple_product.stock_status.as_ref() == Some(&"IN_STOCK".to_string()) { "text-green-600 font-semibold" } else { "text-red-600 font-semibold" }
+                                                } else {
+                                                    "text-gray-600 font-semibold"
+                                                },
                                                 "{stock_info}"
                                             }
                                         }
