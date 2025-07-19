@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use gloo_storage::{LocalStorage, Storage};
 
 // Modules
 use crate::{
@@ -213,61 +214,37 @@ pub fn ProductPage(product_slug: String) -> Element {
                                                 class: "block bg-orange-300 hover:bg-orange-400 text-center text-white font-bold font-heading py-5 px-8 rounded-md uppercase transition duration-200",
                                                 onclick: move |_| {
                                                     if let Some(product_id) = product.database_id {
-                                                        let cart_controller = CartController::new();
+                                                        let mut cart_controller = CartController::new();
                                                         spawn(async move {
-                                                            match cart_controller
-                                                                .add_to_cart(product_id, 1)
-                                                                .await
-                                                            {
+                                                            match cart_controller.add_to_cart(product_id, 1).await {
                                                                 Ok(_) => {
                                                                     // Refetch cart after adding an item
-                                                                    match cart_controller
-                                                                        .get_cart()
-                                                                        .await
-                                                                    {
+                                                                    match cart_controller.get_cart().await {
                                                                         Ok(Some(response_data)) => {
-                                                                            if let Some(cart) =
-                                                                                response_data.cart
-                                                                            {
-                                                                                let mut state =
-                                                                                    STATE.write();
-                                                                                if let Some(
-                                                                                    contents,
-                                                                                ) = cart.contents
-                                                                                {
-                                                                                    state
-                                                                                        .cart
-                                                                                        .items = contents
-                                                                                        .nodes
-                                                                                        .into_iter()
-                                                                                        .collect();
+                                                                            if let Some(cart) = response_data.cart {
+                                                                                let mut state = STATE.write();
+                                                                                if let Some(contents) = cart.contents {
+                                                                                    state.cart.items =
+                                                                                        contents.nodes.into_iter().collect();
                                                                                 }
-                                                                                state
-                                                                                    .cart
-                                                                                    .total = cart
-                                                                                    .total
-                                                                                    .unwrap_or_default();
-                                                                                state
-                                                                                    .cart
-                                                                                    .subtotal = cart
-                                                                                    .subtotal
-                                                                                    .unwrap_or_default();
+                                                                                state.cart.total = cart.total.unwrap_or_default();
+                                                                                state.cart.subtotal =
+                                                                                    cart.subtotal.unwrap_or_default();
+
+                                                                                // Save cart to local storage
+                                                                                if let Err(e) = LocalStorage::set("cart", state.cart.clone()) {
+                                                                                    tracing::error!("Failed to save cart to local storage: {}", e);
+                                                                                }
                                                                             }
                                                                         }
                                                                         Ok(None) => {}
                                                                         Err(e) => {
-                                                                            tracing::error!(
-                                                                                "Error refetching cart: {}",
-                                                                                e
-                                                                            );
+                                                                            tracing::error!("Error refetching cart: {}", e);
                                                                         }
                                                                     }
                                                                 }
                                                                 Err(e) => {
-                                                                    tracing::error!(
-                                                                        "Error adding to cart: {}",
-                                                                        e
-                                                                    );
+                                                                    tracing::error!("Error adding to cart: {}", e);
                                                                 }
                                                             }
                                                         });

@@ -1,5 +1,6 @@
 use crate::graphql::models::cart::cart_query;
 use dioxus::prelude::*;
+use gloo_storage::{LocalStorage, Storage};
 use serde::Deserialize;
 
 /// # Global State Signal
@@ -33,10 +34,15 @@ impl State {
     ///
     /// Create a default state instance.
     pub fn default() -> Self {
+        let cart = match LocalStorage::get("cart") {
+            Ok(cart) => cart,
+            Err(_) => Cart::default(),
+        };
+
         Self {
             backend_host: Env::backend_host_default(),
             backend_path: Env::backend_path_default(),
-            cart: Cart::default(),
+            cart,
         }
     }
 

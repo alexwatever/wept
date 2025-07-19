@@ -48,7 +48,7 @@ impl CartController {
     }
 
     pub async fn add_to_cart(
-        &self,
+        &mut self,
         product_id: i64,
         quantity: i64,
     ) -> anyhow::Result<Option<add_to_cart::ResponseData>> {
@@ -65,13 +65,18 @@ impl CartController {
         if let Some(token) = response.headers().get("woocommerce-session") {
             if let Ok(token_str) = token.to_str() {
                 Self::set_session_token(token_str);
-                let mut new_client = self.client.clone();
-                new_client.set_session_token(token_str.to_string());
+                self.client.set_session_token(token_str.to_string());
             }
         }
 
         let response_body: Response<add_to_cart::ResponseData> =
             response.json().await.map_err(|e| anyhow::anyhow!(e))?;
+
+        if let Some(errors) = response_body.errors {
+            if !errors.is_empty() {
+                return Err(anyhow::anyhow!("GraphQL error: {:?}", errors));
+            }
+        }
 
         Ok(response_body.data)
     }
