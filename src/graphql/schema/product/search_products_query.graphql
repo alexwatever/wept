@@ -10,6 +10,8 @@ query SearchProductsQuery($search: String!) {
         ... on SimpleProduct {
           price
           regularPrice
+          salePrice
+          stockStatus
         }
         image {
           id

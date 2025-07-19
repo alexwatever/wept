@@ -37,7 +37,6 @@ query ProductQuery($slug: ID!) {
       regularPrice
       salePrice
       stockQuantity
-      id
       databaseId
     }
     ... on VariableProduct {

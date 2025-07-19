@@ -423,8 +423,7 @@ impl From<ProductCategoryGraphqlProductNode> for Product {
             date_on_sale_from: None,
             date_on_sale_to: None,
             gallery_images: None,
-            simple_product: simple_product
-                .map(|sp| ProductSimpleProduct::SimpleProduct(SimpleProduct::from(sp))),
+            simple_product: simple_product.map(ProductSimpleProduct::SimpleProduct),
             database_id: None,
         }
     }

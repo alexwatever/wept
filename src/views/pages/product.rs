@@ -55,44 +55,51 @@ pub fn ProductPage(product_slug: String) -> Element {
                 .and_then(|img: &ProductImage| img.source_url.clone());
 
             // Produce price
-            let price: Option<String> =
-                if let ProductSimpleProduct::SimpleProduct(simple_product) = &simple_product {
-                    if simple_product.on_sale.unwrap_or(false) {
-                        if let (Some(regular_price), Some(sale_price)) = (
-                            simple_product.regular_price.as_ref(),
-                            simple_product.sale_price.as_ref(),
-                        ) {
+            let price: Option<String> = match &simple_product {
+                ProductSimpleProduct::SimpleProduct(sp) => {
+                    if sp.on_sale.unwrap_or(false) {
+                        if let (Some(regular_price), Some(sale_price)) =
+                            (sp.regular_price.as_ref(), sp.sale_price.as_ref())
+                        {
                             Some(format!("{} (Sale: {})", regular_price, sale_price))
                         } else {
                             None
                         }
                     } else {
-                        simple_product.price.clone()
+                        sp.price.clone()
                     }
-                } else {
-                    None
-                };
+                }
+                ProductSimpleProduct::SimpleProductFromProductsQuery(sp) => sp.price.clone(),
+                ProductSimpleProduct::SimpleProductFromProductQuery(sp) => sp.price.clone(),
+                ProductSimpleProduct::SimpleProductFromSearchProductsQuery(sp) => sp.price.clone(),
+            };
 
             // Product stock status
-            let stock_info: String =
-                if let ProductSimpleProduct::SimpleProduct(simple_product) = &simple_product {
+            let stock_info: String = match &simple_product {
+                ProductSimpleProduct::SimpleProduct(sp) => {
                     match (
-                        simple_product.stock_status.as_ref().map(|s| s),
-                        simple_product.stock_quantity.as_ref().map(|q| *q),
+                        sp.stock_status.as_ref().map(|s| s.as_str()),
+                        sp.stock_quantity,
                     ) {
-                        (Some(label), Some(qty)) if qty > 0 && label == "IN_STOCK" => {
+                        (Some("IN_STOCK"), Some(qty)) if qty > 0 => {
                             format!("In Stock ({} available)", qty)
                         }
-                        (Some(label), _) if label == "IN_STOCK" => "In Stock".to_string(),
-                        (Some(label), _) if label == "OUT_OF_STOCK" => "Out of Stock".to_string(),
-                        (Some(label), _) if label == "ON_BACKORDER" => {
-                            "Available on Backorder".to_string()
-                        }
+                        (Some("IN_STOCK"), _) => "In Stock".to_string(),
+                        (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
+                        (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
                         _ => "Status Unknown".to_string(),
                     }
-                } else {
-                    "Status Unknown".to_string()
-                };
+                }
+                ProductSimpleProduct::SimpleProductFromProductsQuery(sp) => {
+                    format!("{:?}", sp.stock_status)
+                }
+                ProductSimpleProduct::SimpleProductFromProductQuery(sp) => {
+                    format!("{:?}", sp.stock_status)
+                }
+                ProductSimpleProduct::SimpleProductFromSearchProductsQuery(sp) => {
+                    format!("{:?}", sp.stock_status)
+                }
+            };
 
             // Render page
             rsx! {
@@ -146,10 +153,39 @@ pub fn ProductPage(product_slug: String) -> Element {
                                         // Stock status
                                         p { class: "mb-8 text-sm",
                                             span {
-                                                class: if let ProductSimpleProduct::SimpleProduct(simple_product) = &simple_product {
-                                                    if simple_product.stock_status.as_ref() == Some(&"IN_STOCK".to_string()) { "text-green-600 font-semibold" } else { "text-red-600 font-semibold" }
+                                                class: if match &simple_product {
+                                                    ProductSimpleProduct::SimpleProduct(sp) => {
+                                                        sp.stock_status.as_ref()
+                                                            == Some(&"IN_STOCK".to_string())
+                                                    }
+                                                    ProductSimpleProduct::SimpleProductFromProductsQuery(
+                                                        sp,
+                                                    ) => {
+                                                        sp.stock_status
+                                                            == Some(
+                                                                crate::graphql::models::product::products_query::StockStatusEnum::IN_STOCK,
+                                                            )
+                                                    }
+                                                    ProductSimpleProduct::SimpleProductFromProductQuery(
+                                                        sp,
+                                                    ) => {
+                                                        sp.stock_status
+                                                            == Some(
+                                                                crate::graphql::models::product::product_query::StockStatusEnum::IN_STOCK,
+                                                            )
+                                                    }
+                                                    ProductSimpleProduct::SimpleProductFromSearchProductsQuery(
+                                                        sp,
+                                                    ) => {
+                                                        sp.stock_status
+                                                            == Some(
+                                                                crate::graphql::models::product::search_products_query::StockStatusEnum::IN_STOCK,
+                                                            )
+                                                    }
+                                                } {
+                                                    "text-green-600 font-semibold"
                                                 } else {
-                                                    "text-gray-600 font-semibold"
+                                                    "text-red-600 font-semibold"
                                                 },
                                                 "{stock_info}"
                                             }
@@ -179,28 +215,59 @@ pub fn ProductPage(product_slug: String) -> Element {
                                                     if let Some(product_id) = product.database_id {
                                                         let cart_controller = CartController::new();
                                                         spawn(async move {
-                                                            match cart_controller.add_to_cart(product_id, 1).await {
+                                                            match cart_controller
+                                                                .add_to_cart(product_id, 1)
+                                                                .await
+                                                            {
                                                                 Ok(_) => {
                                                                     // Refetch cart after adding an item
-                                                                    match cart_controller.get_cart().await {
+                                                                    match cart_controller
+                                                                        .get_cart()
+                                                                        .await
+                                                                    {
                                                                         Ok(Some(response_data)) => {
-                                                                            if let Some(cart) = response_data.cart {
-                                                                                let mut state = STATE.write();
-                                                                                if let Some(contents) = cart.contents {
-                                                                                    state.cart.items = contents.nodes.into_iter().filter_map(|x| Some(x)).collect();
+                                                                            if let Some(cart) =
+                                                                                response_data.cart
+                                                                            {
+                                                                                let mut state =
+                                                                                    STATE.write();
+                                                                                if let Some(
+                                                                                    contents,
+                                                                                ) = cart.contents
+                                                                                {
+                                                                                    state
+                                                                                        .cart
+                                                                                        .items = contents
+                                                                                        .nodes
+                                                                                        .into_iter()
+                                                                                        .collect();
                                                                                 }
-                                                                                state.cart.total = cart.total.unwrap_or_default();
-                                                                                state.cart.subtotal = cart.subtotal.unwrap_or_default();
+                                                                                state
+                                                                                    .cart
+                                                                                    .total = cart
+                                                                                    .total
+                                                                                    .unwrap_or_default();
+                                                                                state
+                                                                                    .cart
+                                                                                    .subtotal = cart
+                                                                                    .subtotal
+                                                                                    .unwrap_or_default();
                                                                             }
                                                                         }
                                                                         Ok(None) => {}
                                                                         Err(e) => {
-                                                                            tracing::error!("Error refetching cart: {}", e);
+                                                                            tracing::error!(
+                                                                                "Error refetching cart: {}",
+                                                                                e
+                                                                            );
                                                                         }
                                                                     }
                                                                 }
                                                                 Err(e) => {
-                                                                    tracing::error!("Error adding to cart: {}", e);
+                                                                    tracing::error!(
+                                                                        "Error adding to cart: {}",
+                                                                        e
+                                                                    );
                                                                 }
                                                             }
                                                         });
