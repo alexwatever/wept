@@ -2,8 +2,8 @@ use dioxus::prelude::*;
 
 // Modules
 use crate::{
-    app::error::AppError,
-    controllers::{entity::EntityController, product::ProductController},
+    app::{error::AppError, state::STATE},
+    controllers::{cart::CartController, entity::EntityController, product::ProductController},
     models::product::{Product, ProductImage, SimpleProduct},
     views::components::common::loader::LoaderComponent,
     views::pages::errors::NotFoundPage,
@@ -15,7 +15,7 @@ pub fn ProductPage(product_slug: String) -> Element {
     // Fetch the product
     let slug_for_resource: String = product_slug.clone();
     let product_resource: Resource<Result<Product, AppError>> = use_resource(move || {
-        let slug_for_async_operation: String = slug_for_resource.clone();
+        let slug_for_async_operation = slug_for_resource.clone();
         async move {
             ProductController::new()
                 .get_by_slug(&slug_for_async_operation)
@@ -23,15 +23,9 @@ pub fn ProductPage(product_slug: String) -> Element {
         }
     });
 
-    // Wait for product data
-    let product_data = product_resource.read();
-    match product_data.as_ref() {
-        // Loading state
-        None => rsx! { LoaderComponent {} },
-        // Error state
-        Some(Err(app_error)) => app_error.render(vec!["product".to_string(), product_slug]),
-        // Product found
+    let rendered = match &*product_resource.read() {
         Some(Ok(product)) => {
+            let product = product.clone();
             // Get Product values
             let Product {
                 sku,
@@ -83,15 +77,16 @@ pub fn ProductPage(product_slug: String) -> Element {
             };
 
             // Product stock status
-            let stock_info: String = match (stock_status.as_deref(), stock_quantity) {
-                (Some("IN_STOCK"), Some(qty)) if qty > &0 => {
-                    format!("In Stock ({} available)", qty)
-                }
-                (Some("IN_STOCK"), _) => "In Stock".to_string(),
-                (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
-                (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
-                _ => "Status Unknown".to_string(),
-            };
+            let stock_info: String =
+                match (stock_status.as_deref(), stock_quantity.as_ref().map(|q| *q)) {
+                    (Some("IN_STOCK"), Some(qty)) if qty > 0 => {
+                        format!("In Stock ({} available)", qty)
+                    }
+                    (Some("IN_STOCK"), _) => "In Stock".to_string(),
+                    (Some("OUT_OF_STOCK"), _) => "Out of Stock".to_string(),
+                    (Some("ON_BACKORDER"), _) => "Available on Backorder".to_string(),
+                    _ => "Status Unknown".to_string(),
+                };
 
             // Render page
             rsx! {
@@ -168,8 +163,39 @@ pub fn ProductPage(product_slug: String) -> Element {
                                     // Add to cart
                                     div { class: "flex flex-wrap -mx-4 mb-14 items-center",
                                         div { class: "w-full xl:w-2/3 px-4 mb-4 xl:mb-0",
-                                            a { class: "block bg-orange-300 hover:bg-orange-400 text-center text-white font-bold font-heading py-5 px-8 rounded-md uppercase transition duration-200",
-                                                href: "#",
+                                            button {
+                                                class: "block bg-orange-300 hover:bg-orange-400 text-center text-white font-bold font-heading py-5 px-8 rounded-md uppercase transition duration-200",
+                                                onclick: move |_| {
+                                                    if let Some(product_id) = product.database_id {
+                                                        let cart_controller = CartController::new();
+                                                        spawn(async move {
+                                                            match cart_controller.add_to_cart(product_id, 1).await {
+                                                                Ok(_) => {
+                                                                    // Refetch cart after adding an item
+                                                                    match cart_controller.get_cart().await {
+                                                                        Ok(Some(response_data)) => {
+                                                                            if let Some(cart) = response_data.cart {
+                                                                                let mut state = STATE.write();
+                                                                                if let Some(contents) = cart.contents {
+                                                                                    state.cart.items = contents.nodes.into_iter().filter_map(|x| Some(x)).collect();
+                                                                                }
+                                                                                state.cart.total = cart.total.unwrap_or_default();
+                                                                                state.cart.subtotal = cart.subtotal.unwrap_or_default();
+                                                                            }
+                                                                        }
+                                                                        Ok(None) => {}
+                                                                        Err(e) => {
+                                                                            tracing::error!("Error refetching cart: {}", e);
+                                                                        }
+                                                                    }
+                                                                }
+                                                                Err(e) => {
+                                                                    tracing::error!("Error adding to cart: {}", e);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                },
                                                 "Add to cart"
                                             }
                                         }
@@ -181,5 +207,12 @@ pub fn ProductPage(product_slug: String) -> Element {
                 }
             }
         }
-    }
+        Some(Err(e)) => rsx! {
+            p { "Error: {e}" }
+        },
+        None => rsx! {
+            LoaderComponent {}
+        },
+    };
+    rendered
 }

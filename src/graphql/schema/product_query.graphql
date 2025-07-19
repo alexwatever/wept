@@ -37,19 +37,24 @@ query ProductQuery($slug: ID!) {
       regularPrice
       salePrice
       stockQuantity
+      id
+      databaseId
     }
     ... on VariableProduct {
       __typename
       onSale
       stockStatus
+      databaseId
     }
     ... on ExternalProduct {
       __typename
       onSale
       externalUrl
+      databaseId
     }
     ... on GroupProduct {
       __typename
+      databaseId
     }
   }
 }

@@ -21,13 +21,16 @@ This list is a work in progress. Features are implemented based on what I feel l
     - [x] Create the Page page routing and components
     - [x] Create the Pages page routing and components
     - [x] Create the Search page routing and components
+    - [ ] Create the Cart page routing and components
     - [ ] Create components:
         - [x] Footer
-        - [ ] Menu
+        - [x] Menu
+        - [ ] Mini Cart + state management
+        - [ ] Get Quote form/component
+        - [ ] Layered Navigation (subcategory navigation at least)
         - [ ] Pagination
     - [ ] Create the Contact page routing and components
     - [ ] Create the Gallery page routing and components
-    - [ ] Create the Get Quote functionality
 - [ ] Integrations:
     - [ ] SCSS
     - [ ] Contact Form 7 via REST API, or Ninja Forms via GraphQL

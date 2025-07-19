@@ -21,6 +21,7 @@ tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["fmt"] }
 tracing-wasm = "0.2.1"
 uuid = { version = "1.16", features = ["v4", "serde", "js"] }
+wasm-bindgen = { version = "0.2" } # required despite clippy warnings
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 # chrono = { version = "0.4.34", features = ["serde", "wasmbind"] }

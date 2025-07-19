@@ -4,8 +4,8 @@ use dioxus::prelude::*;
 use crate::views::{
     layouts::MainLayout,
     pages::{
-        categories::CategoriesPage, category::CategoryPage, errors::NotFoundPage, home::HomePage,
-        list::PagesListPage, page::PagePage, post::PostPage, posts::PostsPage,
+        cart::CartPage, categories::CategoriesPage, category::CategoryPage, errors::NotFoundPage,
+        home::HomePage, list::PagesListPage, page::PagePage, post::PostPage, posts::PostsPage,
         product::ProductPage, search::SearchPage,
     },
 };
@@ -20,6 +20,10 @@ pub enum Routes {
     /// Route for the Home page.
     #[route("/")]
     HomePage {},
+
+    /// Route for the Cart page.
+    #[route("/cart")]
+    CartPage {},
 
     /// Route for the Product page.
     #[route("/product/:product_slug")]

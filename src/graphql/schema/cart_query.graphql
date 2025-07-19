@@ -1,0 +1,31 @@
+query CartQuery {
+  cart {
+    contents {
+      nodes {
+        __typename
+        product {
+          __typename
+          node {
+            __typename
+            ... on SimpleProduct {
+              id
+              name
+              price
+              featuredImage {
+                node {
+                  sourceUrl
+                  altText
+                }
+              }
+            }
+          }
+        }
+        quantity
+        total
+        subtotal
+      }
+    }
+    subtotal
+    total
+  }
+} 

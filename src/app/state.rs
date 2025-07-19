@@ -1,9 +1,7 @@
+use crate::graphql::models::cart::cart_query;
 use dioxus::prelude::*;
 use serde::Deserialize;
 use tracing::warn;
-
-// # Modules
-use super::config::AppConfig;
 
 /// # Global State Signal
 ///
@@ -11,23 +9,40 @@ use super::config::AppConfig;
 /// Designed to be accessed from any component in the application.
 pub static STATE: GlobalSignal<State> = Global::new(State::default);
 
+#[derive(Clone, Default, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Cart {
+    pub items: Vec<cart_query::CartQueryCartContentsNodes>,
+    pub total: String,
+    pub subtotal: String,
+}
+
 /// # Global State
 ///
 /// The global state of the application.
-#[derive(Debug)]
+#[derive(Clone, Default, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct State {
-    env: Env,
-    _config: AppConfig,
+    /// Backend host
+    backend_host: String,
+    /// Backend path
+    backend_path: String,
+    /// Cart
+    pub cart: Cart,
 }
 
 impl State {
+    /// Initialize the global state
+    pub fn init() {
+        // This function will be implemented later
+    }
+
     /// # Default State
     ///
     /// Create a default state instance.
     pub fn default() -> Self {
         Self {
-            env: Env::default(),
-            _config: AppConfig::default(),
+            backend_host: Env::backend_host_default(),
+            backend_path: Env::backend_path_default(),
+            cart: Cart::default(),
         }
     }
 
@@ -40,7 +55,7 @@ impl State {
             // In WASM context, use the GlobalSignal or fallback
             let state = STATE.try_read();
             match state {
-                Ok(state) => state.env.backend_host.clone(),
+                Ok(state) => state.backend_host.clone(),
                 Err(err) => {
                     tracing::error!("Error reading state for backend host: {err}");
                     Env::backend_host_default()
@@ -51,7 +66,7 @@ impl State {
         #[cfg(not(target_family = "wasm"))]
         {
             let value = STATE.read();
-            value.env.backend_host.clone()
+            value.backend_host.clone()
         }
     }
 
@@ -64,7 +79,7 @@ impl State {
             // In WASM context, use the GlobalSignal or fallback
             let state = STATE.try_read();
             match state {
-                Ok(state) => state.env.backend_path.clone(),
+                Ok(state) => state.backend_path.clone(),
                 Err(err) => {
                     tracing::error!("Error reading state for backend path: {err}");
                     Env::backend_path_default()
@@ -76,7 +91,7 @@ impl State {
         {
             let value = STATE.signal();
             let value = value.read();
-            value.env.backend_path.clone()
+            value.backend_path.clone()
         }
     }
 }

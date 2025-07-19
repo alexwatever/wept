@@ -39,6 +39,23 @@ query ProductsQuery($first: Int, $after: String) {
         regularPrice
         salePrice
         stockQuantity
+        databaseId
+      }
+      ... on VariableProduct {
+        __typename
+        onSale
+        stockStatus
+        databaseId
+      }
+      ... on ExternalProduct {
+        __typename
+        onSale
+        externalUrl
+        databaseId
+      }
+      ... on GroupProduct {
+        __typename
+        databaseId
       }
     }
     pageInfo {

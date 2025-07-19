@@ -1,10 +1,15 @@
 use dioxus::prelude::*;
 
+// Modules
 use crate::{
     controllers::settings::SettingsController,
-    views::components::{common::loader::LoaderComponent, layout::nav::Nav},
+    views::{
+        components::{common::loader::LoaderComponent, layout::nav::Nav},
+        icons::CartIcon,
+    },
 };
 
+/// Header component
 #[component]
 pub fn Header() -> Element {
     let settings = SettingsController::new();
@@ -25,6 +30,7 @@ pub fn Header() -> Element {
                             Some(Ok(Some(data))) => {
                                 if let Some(settings) = data.page.as_ref().and_then(|p| p.wept_settings.as_ref()) {
                                     rsx! {
+                                        // Site Logo
                                         if let Some(logo) = &settings.site_logo {
                                             a { href: "/",
                                                 img {
@@ -34,6 +40,8 @@ pub fn Header() -> Element {
                                                 }
                                             }
                                         }
+
+                                        // Site Name
                                         if let Some(site_name) = &settings.site_name {
                                              if !site_name.is_empty() {
                                                 a { href: "/",
@@ -55,9 +63,15 @@ pub fn Header() -> Element {
                         }
                     }
 
+                    // Cart
+                    div {
+                        CartIcon {}
+                    }
+
                     // Navigation
                     div {
-                        Nav {}
+                        class: "flex items-center space-x-4",
+                        Nav {},
                     }
                 }
             }

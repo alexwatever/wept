@@ -1,3 +1,4 @@
+pub mod cart;
 pub mod category;
 pub mod entity;
 pub mod navigation;

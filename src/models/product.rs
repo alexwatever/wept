@@ -12,8 +12,8 @@ use crate::{
         product::{
             product_query::{
                 ProductQueryProduct, ProductQueryProductGalleryImages,
-                ProductQueryProductGalleryImagesNodes, ProductQueryProductImage,
-                ProductQueryProductOn,
+                ProductQueryProductGalleryImagesNodes, ProductQueryProductOn,
+                ProductQueryProductOnSimpleProduct,
             },
             products_query::{
                 ProductsQueryProducts, ProductsQueryProductsNodes,
@@ -56,75 +56,30 @@ pub struct Product {
     /// Product gallery images
     pub gallery_images: Option<Vec<ProductImage>>,
     /// Simple product data
-    pub simple_product: Option<SimpleProduct>,
+    pub simple_product: Option<ProductQueryProductOnSimpleProduct>,
+    /// Product database ID
+    pub database_id: Option<i64>,
 }
 
 impl From<ProductQueryProduct> for Product {
-    /// Convert a ProductQueryProduct to a Product
-    ///
-    /// **Arguments**
-    ///
-    /// * `product` - The GraphQL response to convert
-    ///
-    /// **Returns**
-    ///
-    /// * `Product` - The converted Product
     fn from(product: ProductQueryProduct) -> Self {
-        // Get the simple product details
-        let simple_product: Option<SimpleProduct> = match product.on {
-            ProductQueryProductOn::SimpleProduct(sp) => Some(SimpleProduct {
-                on_sale: sp.on_sale,
-                stock_status: sp.stock_status.as_ref().map(|e| format!("{:?}", e)),
-                price: sp.price.clone(),
-                raw_price: sp.raw_price.clone(),
-                regular_price: sp.regular_price.clone(),
-                sale_price: sp.sale_price.clone(),
-                stock_quantity: sp.stock_quantity.map(|q| q as i32),
-                sold_individually: None,
-                review_count: None,
-                weight: None,
-                length: None,
-                width: None,
-                height: None,
-                purchasable: None,
-                virtual_product: None,
-                downloadable: None,
-                download_limit: None,
-            }),
-            _ => None,
+        let (database_id, simple_product_data) = match product.on {
+            ProductQueryProductOn::SimpleProduct(sp) => (Some(sp.database_id), Some(sp)),
+            _ => (None, None),
         };
 
-        // Get the featured image ID
-        let featured_image_id: Option<String> = product
-            .image
-            .as_ref()
-            .map(|img: &ProductQueryProductImage| img.id.clone());
-
-        // Get the main product image
-        let image: Option<ProductImage> =
-            product
-                .image
-                .map(|img: ProductQueryProductImage| ProductImage {
-                    id: Some(img.id),
-                    source_url: img.source_url,
-                    alt_text: img.alt_text,
-                    title: img.title,
-                });
-
-        // Get the gallery images
-        let gallery_images: Option<Vec<ProductImage>> = product
-            .gallery_images
-            .map(|images: ProductQueryProductGalleryImages| images.into())
-            .and_then(|images: Vec<ProductImage>| {
-                if images.is_empty() {
-                    None
-                } else {
-                    Some(images)
-                }
-            });
+        let image = product.image.map(|image| ProductImage {
+            id: Some(image.id),
+            source_url: image.source_url,
+            alt_text: image.alt_text,
+            title: image.title,
+        });
+        let featured_image_id = image.as_ref().and_then(|img| img.id.clone());
+        let gallery_images = product.gallery_images.map(|images| images.into());
 
         Self {
             id: product.id,
+            database_id,
             sku: product.sku,
             slug: product.slug,
             name: product.name,
@@ -136,7 +91,7 @@ impl From<ProductQueryProduct> for Product {
             featured_image_id,
             image,
             gallery_images,
-            simple_product,
+            simple_product: simple_product_data,
         }
     }
 }
@@ -371,50 +326,21 @@ impl From<ProductsQueryProductsNodesImage> for ProductImage {
     }
 }
 
+/// From `ProductsQueryProductsNodes` to `Product`
 impl From<ProductsQueryProductsNodes> for Product {
-    /// Convert a ProductsQueryProductsNodes to a Product
-    ///
-    /// **Arguments**
-    ///
-    /// * `product` - The GraphQL product node to convert
-    ///
-    /// **Returns**
-    ///
-    /// * `Self` - The converted Product
     fn from(product: ProductsQueryProductsNodes) -> Self {
-        // Get the simple product details
-        let simple_product: Option<SimpleProduct> = match product.on {
-            ProductsQueryProductsNodesOn::SimpleProduct(sp) => Some(SimpleProduct {
-                on_sale: sp.on_sale,
-                stock_status: sp.stock_status.as_ref().map(|e| format!("{:?}", e)),
-                price: sp.price.clone(),
-                raw_price: sp.raw_price.clone(),
-                regular_price: sp.regular_price.clone(),
-                sale_price: sp.sale_price.clone(),
-                stock_quantity: sp.stock_quantity.map(|q| q as i32),
-                sold_individually: None,
-                review_count: None,
-                weight: None,
-                length: None,
-                width: None,
-                height: None,
-                purchasable: None,
-                virtual_product: None,
-                downloadable: None,
-                download_limit: None,
-            }),
-            _ => None,
+        let (database_id, simple_product_data) = match product.on {
+            ProductsQueryProductsNodesOn::SimpleProduct(sp) => (Some(sp.database_id), Some(sp)),
+            _ => (None, None),
         };
 
-        // Get images
-        let image: Option<ProductImage> = product.image.map(ProductImage::from);
-        let featured_image_id: Option<String> = image.as_ref().and_then(|img_m| img_m.id.clone());
-        let gallery_images: Option<Vec<ProductImage>> = product
-            .gallery_images
-            .map(|images: ProductsQueryProductsNodesGalleryImages| images.into());
+        let image = product.image.map(ProductImage::from);
+        let featured_image_id = image.as_ref().and_then(|img| img.id.clone());
+        let gallery_images = product.gallery_images.map(|images| images.into());
 
         Self {
             id: product.id,
+            database_id,
             sku: product.sku,
             slug: product.slug,
             name: product.name,
@@ -426,7 +352,7 @@ impl From<ProductsQueryProductsNodes> for Product {
             featured_image_id,
             image,
             gallery_images,
-            simple_product,
+            simple_product: simple_product_data,
         }
     }
 }
@@ -487,39 +413,37 @@ impl From<ProductCategoryGraphqlProductNode> for Product {
             date_on_sale_to: None,
             gallery_images: None,
             simple_product,
+            database_id: None,
         }
     }
 }
 
+/// From `SearchProductsQueryProductsEdgesNode` to `Product`
 impl From<search_products_query::SearchProductsQueryProductsEdgesNode> for Product {
-    fn from(node: search_products_query::SearchProductsQueryProductsEdgesNode) -> Self {
-        let image = node.image.map(|img| ProductImage {
-            id: Some(img.id),
-            source_url: img.source_url,
-            alt_text: img.alt_text,
-            title: None,
-        });
+    fn from(product: search_products_query::SearchProductsQueryProductsEdgesNode) -> Self {
+        let (database_id, simple_product_data) = match product.on {
+            search_products_query::SearchProductsQueryProductsEdgesNodeOn::SimpleProduct(sp) => {
+                (Some(product.database_id), Some(sp))
+            }
+            _ => (Some(product.database_id), None),
+        };
 
-        let simple_product =
-            if let search_products_query::SearchProductsQueryProductsEdgesNodeOn::SimpleProduct(
-                sp,
-            ) = node.on
-            {
-                Some(SimpleProduct {
-                    price: sp.price,
-                    regular_price: sp.regular_price,
-                    ..Default::default()
-                })
-            } else {
-                None
-            };
+        let image = product.image.map(|image| ProductImage {
+            id: Some(image.id),
+            source_url: image.source_url,
+            alt_text: image.alt_text,
+            title: image.title,
+        });
+        let featured_image_id = image.as_ref().and_then(|img| img.id.clone());
 
         Self {
-            id: node.id,
-            name: node.name,
-            slug: node.slug,
+            id: product.id,
+            database_id,
+            slug: product.slug,
+            name: product.name,
             image,
-            simple_product,
+            featured_image_id,
+            simple_product: simple_product_data,
             ..Default::default()
         }
     }
