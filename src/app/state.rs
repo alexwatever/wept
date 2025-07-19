@@ -1,7 +1,6 @@
 use crate::graphql::models::cart::cart_query;
 use dioxus::prelude::*;
 use serde::Deserialize;
-use tracing::warn;
 
 /// # Global State Signal
 ///
@@ -30,11 +29,6 @@ pub struct State {
 }
 
 impl State {
-    /// Initialize the global state
-    pub fn init() {
-        // This function will be implemented later
-    }
-
     /// # Default State
     ///
     /// Create a default state instance.
@@ -100,14 +94,7 @@ impl State {
 ///
 /// The environment variables for the application.
 #[derive(Deserialize, Default, Debug)]
-struct Env {
-    /// WordPress backend host URL
-    #[serde(default = "Env::backend_host_default")]
-    backend_host: String,
-    /// GraphQL API path relative to the host
-    #[serde(default = "Env::backend_path_default")]
-    backend_path: String,
-}
+struct Env {}
 
 impl Env {
     /// # Fallback Backend Host
@@ -115,24 +102,6 @@ impl Env {
 
     /// # Fallback Backend Path
     const FALLBACK_BACKEND_PATH: &str = "graphql";
-
-    /// # Default Environment Variables
-    ///
-    /// Attempts to load from .env file first (on non-WASM), then uses fallbacks.
-    fn default() -> Self {
-        warn!("Using fallback configuration for Env.");
-        Self::default_with_fallbacks()
-    }
-
-    /// # Default with Fallbacks
-    ///
-    /// Creates a default configuration using fallback values.
-    fn default_with_fallbacks() -> Self {
-        Self {
-            backend_host: Self::backend_host_default(),
-            backend_path: Self::backend_path_default(),
-        }
-    }
 
     /// # Default Backend Host
     ///

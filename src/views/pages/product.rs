@@ -56,7 +56,7 @@ pub fn ProductPage(product_slug: String) -> Element {
 
             // Produce price
             let price: Option<String> =
-                if let ProductSimpleProduct::SimpleProduct(simple_product) = simple_product {
+                if let ProductSimpleProduct::SimpleProduct(simple_product) = &simple_product {
                     if simple_product.on_sale.unwrap_or(false) {
                         if let (Some(regular_price), Some(sale_price)) = (
                             simple_product.regular_price.as_ref(),
