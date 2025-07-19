@@ -3,7 +3,7 @@ use dioxus_router::prelude::Link;
 
 // Modules
 use crate::{
-    models::product::{Product, ProductImage},
+    models::product::{Product, ProductImage, ProductSimpleProduct},
     routes::Routes,
     views::components::common::card::Card,
 };
@@ -26,8 +26,8 @@ pub fn ProductCard(product: Product) -> Element {
                 src: "{image_url}",
                 alt: "{product.name.as_ref().unwrap_or(&String::new())}"
             }
-            if let Some(price) = &product.simple_product.clone().map(|p| p.price) {
-                if let Some(price) = price.as_ref() {
+            if let Some(ProductSimpleProduct::SimpleProduct(simple_product)) = &product.simple_product {
+                if let Some(price) = simple_product.price.as_ref() {
                     p { class: "text-blue-500 font-bold",
                         "{price}"
                     }
