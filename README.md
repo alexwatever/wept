@@ -21,11 +21,11 @@ This list is a work in progress. Features are implemented based on what I feel l
     - [x] Create the Page page routing and components
     - [x] Create the Pages page routing and components
     - [x] Create the Search page routing and components
-    - [ ] Create the Cart page routing and components
+    - [x] Create the Cart page routing and components
     - [ ] Create components:
         - [x] Footer
         - [x] Menu
-        - [ ] Mini Cart + state management
+        - [x] Mini Cart + state management
         - [ ] Get Quote form/component
         - [ ] Layered Navigation (subcategory navigation at least)
         - [ ] Pagination

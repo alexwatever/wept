@@ -4,7 +4,7 @@ use reqwest::Client;
 use serde::{de::DeserializeOwned, Serialize};
 
 // Modules
-use crate::app::state::State;
+use crate::app::state::{State, SESSION_TOKEN_KEY};
 
 /// GraphQL client for making requests to the WordPress API
 #[derive(Default, Clone, Debug)]
@@ -70,7 +70,7 @@ impl GraphQLClient {
     {
         let mut builder = self.client.post(Self::get_endpoint());
         if let Some(token) = &self.session_token {
-            builder = builder.header("woocommerce-session", format!("Session {}", token));
+            builder = builder.header(SESSION_TOKEN_KEY, format!("Session {}", token));
         }
 
         builder
@@ -90,7 +90,7 @@ impl GraphQLClient {
     ) -> Result<reqwest::Response, String> {
         let mut builder = self.client.post(Self::get_endpoint());
         if let Some(token) = &self.session_token {
-            builder = builder.header("woocommerce-session", format!("Session {}", token));
+            builder = builder.header(SESSION_TOKEN_KEY, format!("Session {}", token));
         }
 
         builder

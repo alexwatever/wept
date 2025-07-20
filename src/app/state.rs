@@ -11,6 +11,11 @@ use crate::graphql::models::cart::cart_query;
 /// Designed to be accessed from any component in the application.
 pub static STATE: GlobalSignal<State> = Global::new(State::default);
 
+/// # Session Token Key
+///
+/// The key for the WooCommerce session token in local storage.
+pub const SESSION_TOKEN_KEY: &str = "woocommerce-session";
+
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Cart {
     pub items: Vec<cart_query::CartQueryCartContentsNodes>,
