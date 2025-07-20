@@ -1,0 +1,13 @@
+mutation UpdateItemQuantities($items: [CartItemQuantityInput]!) {
+  updateItemQuantities(input: {items: $items}) {
+    cart {
+      contents {
+        nodes {
+          __typename
+          key
+          quantity
+        }
+      }
+    }
+  }
+} 

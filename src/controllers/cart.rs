@@ -2,7 +2,10 @@ use crate::{
     app::error::{AppError, AppErrorKind, GraphQLErrorWrapper},
     graphql::{
         client::{GraphQLClient, Response},
-        models::cart::{add_to_cart, cart_query, AddToCart, CartQuery},
+        models::cart::{
+            add_to_cart, cart_query, remove_items_from_cart, update_item_quantities, AddToCart,
+            CartQuery, RemoveItemsFromCart, UpdateItemQuantities,
+        },
     },
 };
 use wasm_bindgen::prelude::*;
@@ -90,7 +93,7 @@ impl CartController {
         let response_body: Response<add_to_cart::ResponseData> =
             response.json().await.map_err(|e| {
                 AppError::new(
-                    AppErrorKind::Parse,
+                    AppErrorKind::Json,
                     "An error occurred while parsing the cart response.".to_string(),
                     Some(format!("Failed to parse add_to_cart response: {}", e)),
                     None,
@@ -102,6 +105,110 @@ impl CartController {
                 return Err(AppError::new(
                     AppErrorKind::GraphQL,
                     "An error occurred while adding the item to the cart.".to_string(),
+                    Some(format!("GraphQL error: {:?}", errors)),
+                    None,
+                ));
+            }
+        }
+
+        Ok(response_body.data)
+    }
+
+    pub async fn update_item_quantity(
+        &mut self,
+        key: String,
+        quantity: i64,
+    ) -> Result<Option<update_item_quantities::ResponseData>, AppError> {
+        let variables = update_item_quantities::Variables {
+            items: vec![Some(update_item_quantities::CartItemQuantityInput {
+                key: key.clone(),
+                quantity,
+            })],
+        };
+        let response = self
+            .client
+            .execute_mutation::<_, UpdateItemQuantities>(variables)
+            .await
+            .map_err(|e| {
+                AppError::new_with_source(
+                    AppErrorKind::GraphQL,
+                    "An error occurred while updating the item quantity.".to_string(),
+                    Some(format!(
+                        "Failed to execute update_item_quantity mutation for key '{}'.",
+                        key
+                    )),
+                    GraphQLErrorWrapper(e),
+                )
+            })?;
+
+        let response_body: Response<update_item_quantities::ResponseData> =
+            response.json().await.map_err(|e| {
+                AppError::new(
+                    AppErrorKind::Json,
+                    "An error occurred while parsing the cart response.".to_string(),
+                    Some(format!(
+                        "Failed to parse update_item_quantity response: {}",
+                        e
+                    )),
+                    None,
+                )
+            })?;
+
+        if let Some(errors) = response_body.errors {
+            if !errors.is_empty() {
+                return Err(AppError::new(
+                    AppErrorKind::GraphQL,
+                    "An error occurred while updating the item quantity.".to_string(),
+                    Some(format!("GraphQL error: {:?}", errors)),
+                    None,
+                ));
+            }
+        }
+
+        Ok(response_body.data)
+    }
+
+    pub async fn remove_item_from_cart(
+        &mut self,
+        key: String,
+    ) -> Result<Option<remove_items_from_cart::ResponseData>, AppError> {
+        let variables = remove_items_from_cart::Variables {
+            keys: vec![Some(key.clone())],
+        };
+        let response = self
+            .client
+            .execute_mutation::<_, RemoveItemsFromCart>(variables)
+            .await
+            .map_err(|e| {
+                AppError::new_with_source(
+                    AppErrorKind::GraphQL,
+                    "An error occurred while removing the item from the cart.".to_string(),
+                    Some(format!(
+                        "Failed to execute remove_item_from_cart mutation for key '{}'.",
+                        key
+                    )),
+                    GraphQLErrorWrapper(e),
+                )
+            })?;
+
+        let response_body: Response<remove_items_from_cart::ResponseData> =
+            response.json().await.map_err(|e| {
+                AppError::new(
+                    AppErrorKind::Json,
+                    "An error occurred while parsing the cart response.".to_string(),
+                    Some(format!(
+                        "Failed to parse remove_item_from_cart response: {}",
+                        e
+                    )),
+                    None,
+                )
+            })?;
+
+        if let Some(errors) = response_body.errors {
+            if !errors.is_empty() {
+                return Err(AppError::new(
+                    AppErrorKind::GraphQL,
+                    "An error occurred while removing the item from the cart.".to_string(),
                     Some(format!("GraphQL error: {:?}", errors)),
                     None,
                 ));

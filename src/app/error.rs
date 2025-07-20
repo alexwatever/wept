@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use dioxus::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::{
     error::Error,
     fmt::{self, Display},
@@ -10,7 +11,7 @@ use uuid::Uuid;
 // Modules
 use crate::views::pages::errors::{GenericErrorPage, GenericErrorPageProps, NotFoundPage};
 
-/// Represents a application error.
+/// Represents an application error.
 ///
 /// Errors are logged automatically upon creation of an AppError instance.
 #[derive(Debug)]
@@ -22,29 +23,34 @@ pub struct AppError {
 }
 
 /// Represents the kind of application error.
-#[derive(Clone, PartialEq, Default, Debug)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum AppErrorKind {
-    /// Errors originating from API interactions
+    /// API error
     Api,
-    /// General errors that don't have a specific kind.
-    #[default]
-    General,
-    /// Errors specific to GraphQL operations.
+    /// GraphQL error
     GraphQL,
-    /// Errors related to data not being found.
+    /// Not found error
     NotFound,
-    /// Errors during data parsing or transformation.
-    Parse,
+    /// Unknown error
+    Unknown,
+    /// JSON error
+    Json,
+}
+
+impl Default for AppErrorKind {
+    fn default() -> Self {
+        AppErrorKind::Unknown
+    }
 }
 
 impl Display for AppErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AppErrorKind::Api => write!(f, "API Error"),
-            AppErrorKind::General => write!(f, "General Error"),
             AppErrorKind::GraphQL => write!(f, "GraphQL Error"),
+            AppErrorKind::Json => write!(f, "JSON Error"),
             AppErrorKind::NotFound => write!(f, "Not Found Error"),
-            AppErrorKind::Parse => write!(f, "Parse Error"),
+            AppErrorKind::Unknown => write!(f, "Unknown Error"),
         }
     }
 }

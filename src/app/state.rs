@@ -1,7 +1,9 @@
-use crate::graphql::models::cart::cart_query;
 use dioxus::prelude::*;
 use gloo_storage::{LocalStorage, Storage};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+
+// Modules
+use crate::graphql::models::cart::cart_query;
 
 /// # Global State Signal
 ///
@@ -9,7 +11,7 @@ use serde::Deserialize;
 /// Designed to be accessed from any component in the application.
 pub static STATE: GlobalSignal<State> = Global::new(State::default);
 
-#[derive(Clone, Default, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Cart {
     pub items: Vec<cart_query::CartQueryCartContentsNodes>,
     pub total: String,
@@ -19,7 +21,7 @@ pub struct Cart {
 /// # Global State
 ///
 /// The global state of the application.
-#[derive(Clone, Default, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct State {
     /// Backend host
     backend_host: String,
@@ -89,6 +91,16 @@ impl State {
             let value = STATE.signal();
             let value = value.read();
             value.backend_path.clone()
+        }
+    }
+
+    /// # Save Cart
+    ///
+    /// Save the cart to local storage. This should be called
+    /// whenever the cart state is modified.
+    pub fn save_cart(&self) {
+        if let Err(e) = LocalStorage::set("cart", &self.cart) {
+            tracing::error!("Failed to save cart to local storage: {}", e);
         }
     }
 }

@@ -1,0 +1,12 @@
+mutation RemoveItemsFromCart($keys: [ID]!) {
+  removeItemsFromCart(input: {keys: $keys}) {
+    cart {
+      contents {
+        nodes {
+          __typename
+          key
+        }
+      }
+    }
+  }
+} 

@@ -1,3 +1,4 @@
+pub mod cart;
 pub mod category;
 pub mod common;
 pub mod layout;

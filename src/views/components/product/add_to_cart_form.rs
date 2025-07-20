@@ -1,8 +1,10 @@
 use dioxus::prelude::*;
 use gloo_storage::{LocalStorage, Storage};
 
+// Modules
 use crate::{app::state::STATE, controllers::cart::CartController, models::product::Product};
 
+/// Add to cart form component
 #[component]
 pub fn AddToCartForm(product: Product) -> Element {
     rsx! {

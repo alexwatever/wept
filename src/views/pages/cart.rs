@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 // Modules
-use crate::app::state::STATE;
+use crate::{app::state::STATE, views::components::cart::item::CartItem};
 
 /// Cart page component
 #[component]
@@ -24,11 +24,8 @@ pub fn CartPage() -> Element {
                     class: "grid grid-cols-1 md:grid-cols-3 gap-8",
                     div {
                         class: "md:col-span-2",
-                        for _item in &cart.items {
-                            div {
-                                class: "flex items-center border-b py-4",
-                                "Item details here"
-                            }
+                        for item in &cart.items {
+                            CartItem { item: item.clone() }
                         }
                     }
                     div {

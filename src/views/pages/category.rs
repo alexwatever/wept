@@ -2,11 +2,15 @@ use dioxus::{hooks::UseResourceState, prelude::*};
 
 // Modules
 use crate::{
+    app::error::AppErrorKind,
     controllers::category::CategoryController,
     models::{category::ProductCategory, product::Product},
-    views::components::{
-        category::category_header::CategoryHeader, common::loader::LoaderComponent,
-        product::product_grid::ProductGrid,
+    views::{
+        components::{
+            category::category_header::CategoryHeader, common::loader::LoaderComponent,
+            product::product_grid::ProductGrid,
+        },
+        pages::errors::GenericErrorPage,
     },
 };
 
@@ -90,8 +94,8 @@ pub fn CategoryPage(slug: String) -> Element {
             if is_loading {
                 rsx! { LoaderComponent {} }
             } else {
-                rsx! { crate::views::pages::errors::GenericErrorPage {
-                    kind: crate::app::error::AppErrorKind::General,
+                rsx! { GenericErrorPage {
+                    kind: AppErrorKind::Unknown,
                     message: "Could not load category information. Please try again later.".to_string(),
                     route: Some(vec!["category".to_string(), slug_for_error.clone()])
                 }}

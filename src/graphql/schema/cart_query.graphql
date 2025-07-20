@@ -3,6 +3,7 @@ query CartQuery {
     contents {
       nodes {
         __typename
+        key
         product {
           __typename
           node {
