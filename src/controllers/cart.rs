@@ -1,5 +1,5 @@
 use crate::{
-    app::error::{AppError, AppErrorKind, GraphQLErrorWrapper},
+    app::error::{AppError, GraphQLErrorWrapper},
     graphql::{
         client::{GraphQLClient, Response},
         models::cart::{
@@ -19,7 +19,7 @@ extern "C" {
     fn getItem(key: &str) -> Option<String>;
 }
 
-const SESSION_TOKEN_KEY: &str = "woocommerce-session";
+const SESSION_TOKEN_KEY: &str = "wept-session";
 
 #[derive(Clone)]
 pub struct CartController {
@@ -48,14 +48,7 @@ impl CartController {
         self.client
             .execute_query::<_, CartQuery, _>(variables)
             .await
-            .map_err(|e| {
-                AppError::new_with_source(
-                    AppErrorKind::GraphQL,
-                    "An error occurred while fetching the cart.".to_string(),
-                    Some("Failed to execute get_cart query.".to_string()),
-                    GraphQLErrorWrapper(e),
-                )
-            })
+            .map_err(|err| AppError::from(GraphQLErrorWrapper(err)))
     }
 
     pub async fn add_to_cart(
@@ -71,43 +64,20 @@ impl CartController {
             .client
             .execute_mutation::<_, AddToCart>(variables)
             .await
-            .map_err(|e| {
-                AppError::new_with_source(
-                    AppErrorKind::GraphQL,
-                    "An error occurred while adding the item to the cart.".to_string(),
-                    Some(format!(
-                        "Failed to execute add_to_cart mutation for product_id '{}'.",
-                        product_id
-                    )),
-                    GraphQLErrorWrapper(e),
-                )
-            })?;
+            .map_err(GraphQLErrorWrapper)?;
 
-        if let Some(token) = response.headers().get("woocommerce-session") {
+        if let Some(token) = response.headers().get(SESSION_TOKEN_KEY) {
             if let Ok(token_str) = token.to_str() {
                 Self::set_session_token(token_str);
                 self.client.set_session_token(token_str.to_string());
             }
         }
 
-        let response_body: Response<add_to_cart::ResponseData> =
-            response.json().await.map_err(|e| {
-                AppError::new(
-                    AppErrorKind::Json,
-                    "An error occurred while parsing the cart response.".to_string(),
-                    Some(format!("Failed to parse add_to_cart response: {}", e)),
-                    None,
-                )
-            })?;
+        let response_body: Response<add_to_cart::ResponseData> = response.json().await?;
 
         if let Some(errors) = response_body.errors {
             if !errors.is_empty() {
-                return Err(AppError::new(
-                    AppErrorKind::GraphQL,
-                    "An error occurred while adding the item to the cart.".to_string(),
-                    Some(format!("GraphQL error: {:?}", errors)),
-                    None,
-                ));
+                Err(errors)?
             }
         }
 
@@ -129,39 +99,13 @@ impl CartController {
             .client
             .execute_mutation::<_, UpdateItemQuantities>(variables)
             .await
-            .map_err(|e| {
-                AppError::new_with_source(
-                    AppErrorKind::GraphQL,
-                    "An error occurred while updating the item quantity.".to_string(),
-                    Some(format!(
-                        "Failed to execute update_item_quantity mutation for key '{}'.",
-                        key
-                    )),
-                    GraphQLErrorWrapper(e),
-                )
-            })?;
+            .map_err(GraphQLErrorWrapper)?;
 
-        let response_body: Response<update_item_quantities::ResponseData> =
-            response.json().await.map_err(|e| {
-                AppError::new(
-                    AppErrorKind::Json,
-                    "An error occurred while parsing the cart response.".to_string(),
-                    Some(format!(
-                        "Failed to parse update_item_quantity response: {}",
-                        e
-                    )),
-                    None,
-                )
-            })?;
+        let response_body: Response<update_item_quantities::ResponseData> = response.json().await?;
 
         if let Some(errors) = response_body.errors {
             if !errors.is_empty() {
-                return Err(AppError::new(
-                    AppErrorKind::GraphQL,
-                    "An error occurred while updating the item quantity.".to_string(),
-                    Some(format!("GraphQL error: {:?}", errors)),
-                    None,
-                ));
+                Err(errors)?
             }
         }
 
@@ -179,39 +123,13 @@ impl CartController {
             .client
             .execute_mutation::<_, RemoveItemsFromCart>(variables)
             .await
-            .map_err(|e| {
-                AppError::new_with_source(
-                    AppErrorKind::GraphQL,
-                    "An error occurred while removing the item from the cart.".to_string(),
-                    Some(format!(
-                        "Failed to execute remove_item_from_cart mutation for key '{}'.",
-                        key
-                    )),
-                    GraphQLErrorWrapper(e),
-                )
-            })?;
+            .map_err(GraphQLErrorWrapper)?;
 
-        let response_body: Response<remove_items_from_cart::ResponseData> =
-            response.json().await.map_err(|e| {
-                AppError::new(
-                    AppErrorKind::Json,
-                    "An error occurred while parsing the cart response.".to_string(),
-                    Some(format!(
-                        "Failed to parse remove_item_from_cart response: {}",
-                        e
-                    )),
-                    None,
-                )
-            })?;
+        let response_body: Response<remove_items_from_cart::ResponseData> = response.json().await?;
 
         if let Some(errors) = response_body.errors {
             if !errors.is_empty() {
-                return Err(AppError::new(
-                    AppErrorKind::GraphQL,
-                    "An error occurred while removing the item from the cart.".to_string(),
-                    Some(format!("GraphQL error: {:?}", errors)),
-                    None,
-                ));
+                Err(errors)?
             }
         }
 

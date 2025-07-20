@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
 use dioxus::prelude::*;
+use graphql_client::Error as GraphQLError;
+use reqwest::Error as ReqwestError;
 use serde::{Deserialize, Serialize};
 use std::{
     error::Error,
@@ -171,6 +173,68 @@ impl Error for AppError {
         self.source
             .as_ref()
             .map(|b| b.as_ref() as &(dyn std::error::Error + 'static))
+    }
+}
+
+impl From<GraphQLError> for AppError {
+    /// Converts a GraphQL error into an AppError.
+    ///
+    /// **Arguments**
+    ///
+    /// * `error` - The GraphQL error to convert.
+    ///
+    /// **Returns**
+    ///
+    /// * `AppError` - The converted AppError.
+    fn from(error: GraphQLError) -> Self {
+        Self::new(
+            AppErrorKind::GraphQL,
+            "An error occurred while making a GraphQL request.".to_string(),
+            Some(format!("GraphQL error: {:?}", error)),
+            None,
+        )
+    }
+}
+
+impl From<Vec<GraphQLError>> for AppError {
+    /// Converts a vector of GraphQL errors into an AppError.
+    ///
+    /// **Arguments**
+    ///
+    /// * `errors` - The vector of GraphQL errors to convert.
+    ///
+    /// **Returns**
+    ///
+    /// * `AppError` - The converted AppError.
+    fn from(errors: Vec<GraphQLError>) -> Self {
+        Self::new(
+            AppErrorKind::GraphQL,
+            "An error occurred while making a GraphQL request.".to_string(),
+            Some(format!("GraphQL errors: {:?}", errors)),
+            None,
+        )
+    }
+}
+
+impl From<ReqwestError> for AppError {
+    fn from(error: ReqwestError) -> Self {
+        Self::new(
+            AppErrorKind::Api,
+            "An error occurred while making a request.".to_string(),
+            Some(format!("Reqwest error: {:?}", error)),
+            None,
+        )
+    }
+}
+
+impl From<GraphQLErrorWrapper> for AppError {
+    fn from(error: GraphQLErrorWrapper) -> Self {
+        Self::new(
+            AppErrorKind::GraphQL,
+            "An error occurred while making a GraphQL request.".to_string(),
+            Some(error.to_string()),
+            Some(Box::new(error)),
+        )
     }
 }
 
